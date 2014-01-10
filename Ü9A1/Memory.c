@@ -29,6 +29,8 @@ int init_card_background();
 #define SCREEN_WIDTH    1280
 #define SCREEN_HEIGHT   1024
 #define SCREEN_BPP      32
+int true() {return 1;}
+int false(){return 0;}
 
 int main(int argc, char *argv[])
 {
@@ -67,7 +69,9 @@ int main(int argc, char *argv[])
 
 	init_card_background();
 	init_cards();
-	start_game(8, cards, 100, 10, 10, &card_background[0]);
+	int result = start_game(8, cards, 100, 10, 10, &card_background[0]);
+	if (result)
+		return result;
 
 	SDL_Quit();
 

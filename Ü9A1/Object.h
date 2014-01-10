@@ -3,6 +3,7 @@
 
 #include "Card.h"
 #include "Picture.h"
+#include "Button.h"
 
 #pragma warning( disable : 4996 )
 
@@ -14,9 +15,10 @@ struct Object
 
 	struct Picture picture;
 	struct Card card;
+	struct Button button;
 };
 
 int IS_NULL(struct Object o);
-extern SDL_Rect *Create_Rect_BO(struct Object o);
+SDL_Rect *Create_Rect_BO(struct Object o, int x, int y);
 
 #endif

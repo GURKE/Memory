@@ -1,2 +1,9 @@
-213 10 855 1003
 ./resources/Game_Background.bmp 0 0 0
+213 10 855 921
+10 10 1093 10 10 242 1093 242 10 474 1093 474 10 706 1093 706	
+./resources/Button.bmp
+./resources/Button_Clicked.bmp
+56 939 307 1016 Beenden 0
+364 939 615 1016 Speichern 1
+672 939 923 1016 - -1
+980 939 1231 1016 - -1
