@@ -34,14 +34,13 @@ int paint_screen();
 char* concat(char *s1, char *s2);
 int Mouse_Clicked(int *mod, int *card1, int *card2, SDL_Event event, int amplayers);
 int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayers);
-
+int Save_Game();
 struct Object objects[1000];
 
 int pairs[8];
 int textfield[8][2];
 
 SDL_Rect PlayerPointsPosition[8];
-SDL_Rect ButtonPosition[2];
 
 struct Button *Buttons[4];
 
@@ -60,9 +59,11 @@ int start_game(int amplayers, struct Card stack[], int AmCards, int SizeX, int S
 	SDL_Event event;  /* event handling structure */
 	int *mod = (int *)malloc(sizeof(int)); // 0 = first card, 1 = second card, 2 = turn cards back or remove them
 	*mod = 0; 
-	int *card1 = (int *)malloc(sizeof(int));
+	int *card1;
+	card1 = (int *)malloc(sizeof(int));
 	*card1 = -1;
-	int *card2 = (int*)malloc(sizeof(int));
+	int *card2;
+	card2 = (int*)malloc(sizeof(int));
 	card2 = -1;
 
 	if (amplayers > 8)
@@ -113,6 +114,13 @@ int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayer
 	paint_screen();
 }
 
+int Save_Game()
+{
+	FILE *f = fopen("Savegame.txt", "w");
+	if (fprintf(f, "") == EOF)
+		return -1;
+}
+
 int Mouse_Clicked(int *mod, int *card1, int *card2, SDL_Event event, int amplayers)
 {
 	int Types[] = { 1, 2 };
@@ -123,7 +131,8 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, SDL_Event event, int amplaye
 		switch (objects[actcard].button.Type) // Beenden
 		{
 		case 0: return -1;
-		case 1: break;
+		case 1: Save_Game();
+			break;
 		}
 	}
 	else
@@ -275,18 +284,21 @@ int init_game(int AmPlayers, struct Card stack[], int AmCards, int AmX, int AmY)
 	// Load the buttons
 	for (int j = 0; j < 4; j++)
 	{
-		if (fscanf(f, "%d %d %d %d %s %d", &ButtonPosition[j].x, &ButtonPosition[j].y, &ButtonPosition[j].w, &ButtonPosition[j].h, &c, &objects[i].button.Type) == EOF)
-			return -1;
-
-		objects[i].x = ButtonPosition[j].x;
-		objects[i].y = ButtonPosition[j].y;
 		objects[i].type = 2;
 		objects[i].enabled = 1;
 		objects[i].picture = Pic_Button;
-		objects[i].button.Picture = &Pic_Button;
-		objects[i].button.Clicked_Picture = &Pic_Button_Clicked;
-		objects[i].button.Text_Picture = Create_Picture_By_Text(objects[i].button.Text_Picture, c, 0);
-		objects[i].button.Clicked = 0;
+
+		int x = 0, y = 0, w = 0, h = 0;
+		if (fscanf(f, "%d %d %d %d %s %d", &x, &y, &w, &h, &c, &objects[i].button.Type) == EOF)
+			return -1;
+
+		objects[i].button = New_Button(objects[i].button, &Pic_Button, &Pic_Button_Clicked, Create_Picture_By_Text(objects[i].button.Text_Picture, c, 0));
+	
+		objects[i].x = x;
+		objects[i].y = y;
+		objects[i].button.x = w;
+		objects[i].button.y = h;
+
 		i++;
 	}
 
@@ -348,24 +360,24 @@ int paint_screen()
 	{
 		if (objects[i].enabled)
 		{
-			switch (objects[i].type) 
+			switch (objects[i].type)
 			{
 			case 1: // card
 				if (objects[i].card.visible)
-					SDL_BlitSurface(objects[i].picture.picture, NULL, _screen, Create_Rect_BO(objects[i], 0, 0)); // Foreground of the card
+					SDL_BlitSurface(objects[i].picture.picture, NULL, _screen, Create_Rect_BO(objects[i], 0)); // Foreground of the card
 				else
-					SDL_BlitSurface((*Card_Background).picture, NULL, _screen, Create_Rect_BO(objects[i], 0, 0)); // Background of the card
+					SDL_BlitSurface((*Card_Background).picture, NULL, _screen, Create_Rect_BO(objects[i], 0)); // Background of the card
 				break;
 			case 2: // Button
 				if (objects[i].button.Clicked)
-					SDL_BlitSurface(objects[i].button.Clicked_Picture->picture, NULL, _screen, Create_Rect_BO(objects[i], 0, 0)); // Draw a clicked button
+					SDL_BlitSurface(objects[i].button.Clicked_Picture->picture, NULL, _screen, Create_Rect_BO(objects[i], 0)); // Draw a clicked button
 				else
-					SDL_BlitSurface(objects[i].button.Picture->picture, NULL, _screen, Create_Rect_BO(objects[i], 0, 0)); // Foreground of the card
+					SDL_BlitSurface(objects[i].button.Picture->picture, NULL, _screen, Create_Rect_BO(objects[i], 0)); // Foreground of the card
 
-				SDL_BlitSurface(objects[i].button.Text_Picture.picture, NULL, _screen, Create_Rect_BO(objects[i], 5, 5)); // Foreground of the card
+				SDL_BlitSurface(objects[i].button.Text_Picture.picture, NULL, _screen, Create_Rect_BO(objects[i], 1)); // Text of the card
 				break;
 			default:
-				SDL_BlitSurface(objects[i].picture.picture, NULL, _screen, Create_Rect_BO(objects[i], 0, 0)); // Draws everything else
+				SDL_BlitSurface(objects[i].picture.picture, NULL, _screen, Create_Rect_BO(objects[i], 0)); // Draws everything else
 				break;
 			}
 		}

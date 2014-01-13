@@ -99,7 +99,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Button.c" />
     <ClCompile Include="Card.c" />
     <ClCompile Include="Game.c" />
     <ClCompile Include="Object.c" />

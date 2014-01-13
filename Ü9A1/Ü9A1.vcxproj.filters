@@ -59,7 +59,7 @@
     <ClCompile Include="Picture.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Button.cpp">
+    <ClCompile Include="Button.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

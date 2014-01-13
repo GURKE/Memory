@@ -9,8 +9,8 @@
 
 struct Object
 {
-	Sint16 x, y;
-	Uint16 type; // 0 = hard/background, 1 = card
+	int x, y;
+	int type; // 0 = hard/background, 1 = card, 2 = button
 	int enabled;
 
 	struct Picture picture;
@@ -19,6 +19,6 @@ struct Object
 };
 
 int IS_NULL(struct Object o);
-SDL_Rect *Create_Rect_BO(struct Object o, int x, int y);
+SDL_Rect *Create_Rect_BO(struct Object o, int move);
 
 #endif

@@ -29,12 +29,12 @@ int IS_NULL(struct Object o)
 		return o.picture.picture == NULL ? 1 : 0;
 }
 
-SDL_Rect *Create_Rect_BO(struct Object o, int x, int y)
+SDL_Rect *Create_Rect_BO(struct Object o, int move) // Creates Rectangle of picture for the paint procedure
 {
 	SDL_Rect *rect = (SDL_Rect *)malloc(sizeof(SDL_Rect));
 	(*rect).h = o.picture.picture->h;
 	(*rect).w = o.picture.picture->w;
-	(*rect).x = o.x + x;
-	(*rect).y = o.y + y;
+	(*rect).x = o.x + (move ? o.button.x : 0);
+	(*rect).y = o.y + (move ? o.button.y : 0);
 	return rect;
 }

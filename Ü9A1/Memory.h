@@ -24,7 +24,4 @@ SDL_Surface *_screen;
 
 int start_game(int amplayers, struct Card stack[], int AmCards, int SizeX, int SizeY, struct Picture *BG);
 
-int true();
-int false();
-
 #endif
