@@ -1,0 +1,5 @@
+dif: 3
+c1: Pfad zum Bild der ersten Karte
+c2: Pfad zum Bild der zweiten Karte
+ch: 2
+FILE *f = fopen("./resources/cards.txt", );

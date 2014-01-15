@@ -64,7 +64,7 @@ int start_game(int amplayers, struct Card stack[], int AmCards, int SizeX, int S
 	*card1 = -1;
 	int *card2;
 	card2 = (int*)malloc(sizeof(int));
-	card2 = -1;
+	*card2 = -1;
 
 	if (amplayers > 8)
 		return TOO_MANY_PLAYERS;
@@ -142,13 +142,13 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, SDL_Event event, int amplaye
 		case 0:	case 1: // tap card
 			if (actcard > -1 && objects[actcard].enabled && !objects[actcard].card.visible)
 			{
-				if (mod == 0)
+				if (*mod == 0)
 					*card1 = actcard;
 				else
 					*card2 = actcard;
 
 				objects[actcard].card.visible = 1;
-				mod++;
+				(*mod)++;
 			}
 			break;
 
@@ -179,7 +179,7 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, SDL_Event event, int amplaye
 				sprintf(c, "%d", AktPlayer + 1);
 				Create_Picture_By_Text(objects[textfield[AktPlayer][0]].picture, concat("Player ", c), 1);
 			}
-			mod = 0;
+			*mod = 0;
 			break;
 		default: break;
 		}

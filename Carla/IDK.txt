@@ -1,0 +1,32 @@
+#define PATH_LENGTH 100
+
+typedef struct Pair
+{
+	char[PATH_LENGTH] card1;
+	char[PATH_LENGTH] card2;
+	int dif;
+	int chapter;
+};
+
+typedef struct Card
+{
+	char[PATH_LENGTH];
+	int vis;
+};
+
+Pair newPair(char* path1, char* path2, int input_dif, int input_chapter)
+{
+	Pair pair;
+	
+	pair.card1 = path1;
+	pair.card2 = path2;
+	dif = input_dif;
+	chapter = input_chapter;
+	
+	return pair;
+}
+
+getPair(char* adresse)
+{
+	
+}
