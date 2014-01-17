@@ -27,18 +27,18 @@
 SDL_Rect Gamefield;
 
 /* function declarations */
-int init_game(int AmPlayers, struct Card stack[], int AmCards, int AmX, int AmY);
-int start_game(int amplayers, int card_background_id, struct Card stack[], int AmCards, int SizeX, int SizeY);
-int dist2card(int x, int y, int type[], int AmOfTypes);
+int init_game(int AmPlayers, struct Card (*stack)[], int AmCards, int AmX, int AmY);
+int start_game(int amplayers, int card_background_id, struct Card (*stack)[], int AmCards, int SizeX, int SizeY, int Loading_Game);
 int paint_screen();
 char* concat(char *s1, char *s2);
-int Mouse_Clicked(int *mod, int *card1, int *card2, SDL_Event event, int amplayers);
+int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int amCards, SDL_Event event, int amplayers);
 int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayers);
-int Save_Game();
-struct Object objects[1000];
+int Save_Game(int amPlayers, struct Card *cards[]);
+int Load_Game();
+struct Object objects[ARRAY_LENGTH];
 
 int pairs[8];
-int textfield[8][2];
+int textfield[8][2]; // ID for the Textfields of: PlayerID, 2nd: 0-PlayerNumber, 1-Pairstext
 
 SDL_Rect PlayerPointsPosition[8];
 
@@ -48,13 +48,13 @@ int AktPlayer;
 
 int ClickedButton = -1;
 
-struct Picture *Card_Background;
 struct Picture Pic_Button;
 struct Picture Pic_Button_Clicked;
 
-int start_game(int amplayers, struct Card stack[], int AmCards, int SizeX, int SizeY, struct Picture *BG)
+int start_game(int amplayers, struct Card (*stack)[], int AmCards, int SizeX, int SizeY, struct Picture *BG, int Loading_Game)
 {
-	Card_Background = BG;
+	// SizeX && SizeY are the amount of Cards in x and y direction on the gamefield
+	Card_Background = *BG;
 
 	SDL_Event event;  /* event handling structure */
 	int *mod = (int *)malloc(sizeof(int)); // 0 = first card, 1 = second card, 2 = turn cards back or remove them
@@ -65,7 +65,7 @@ int start_game(int amplayers, struct Card stack[], int AmCards, int SizeX, int S
 	int *card2;
 	card2 = (int*)malloc(sizeof(int));
 	*card2 = -1;
-
+	
 	if (amplayers > 8)
 		return TOO_MANY_PLAYERS;
 
@@ -73,7 +73,7 @@ int start_game(int amplayers, struct Card stack[], int AmCards, int SizeX, int S
 	if (result)
 		return result;
 
-	paint_screen();
+	paint_screen(_screen, &objects);
 	
 	while (SDL_WaitEvent(&event))
 	{
@@ -81,7 +81,7 @@ int start_game(int amplayers, struct Card stack[], int AmCards, int SizeX, int S
 			break;
 		if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
 		{
-			int result = Mouse_Clicked(mod, card1, card2, event, amplayers);
+			int result = Mouse_Clicked(mod, card1, card2, &stack, AmCards, event, amplayers, SizeX, SizeY);
 			if (result == -1)
 				break;
 
@@ -97,7 +97,7 @@ int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayer
 {
 	// Check for the button
 	int Types[] = { 2 };
-	int actbutton = dist2card(event.button.x, event.button.y, Types, 1);
+	int actbutton = dist2object(&objects, event.button.x, event.button.y, Types, 1);
 	if (actbutton > -1)
 	{
 		if (actbutton != ClickedButton)
@@ -111,28 +111,66 @@ int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayer
 		objects[ClickedButton].button.Clicked = 0;
 		ClickedButton = -1;
 	}
-	paint_screen();
+	paint_screen(_screen, &objects);
 }
 
-int Save_Game()
+int Save_Game(int amPlayers, int amCards, struct Card *cards[], int GameSizeX, int GameSizeY)
 {
 	FILE *f = fopen("Savegame.txt", "w");
 	if (fprintf(f, "") == EOF)
 		return -1;
+
+	fprintf(f, "%d %d %d %s", amPlayers, GameSizeX, GameSizeY, Card_Background.filename);
+
+	Save_Cards(cards, amCards, "Savegame_Cards.txt");
+	
+	//objects
+	//Gamefield
+	//PlayerPointsPosition
+	//AktPlayer
+	//textfield
+	//Pic_Button
+	//Pic_Button_Clicked
+	//pairs
+	//textfield
 }
 
-int Mouse_Clicked(int *mod, int *card1, int *card2, SDL_Event event, int amplayers)
+int Load_Game()
+{
+	FILE *f = fopen("Savegame.txt", "r");
+	if (fprintf(f, "") == EOF)
+		return -1;
+	
+	int GameSizeX = 0, GameSizeY = 0, amPlayers = 0;
+	char FileName[FILENAME_LENGHT];
+	if (fscanf(f, "%d %d %d %s", amPlayers, GameSizeX, GameSizeY, &FileName) == EOF)
+		return FAILED_LOADING_SAVEGAME;
+
+	struct Card cards[ARRAY_LENGTH];
+	int amCards = init_cards(&cards, "Savegame_Cards.txt");
+	if (amCards < 0)
+		return amCards;
+
+	Card_Background = load_picture(Card_Background, FileName);
+
+	start_game(amPlayers, cards, amCards, GameSizeX, GameSizeY, &Card_Background, 1);
+
+	return 0;
+}
+
+int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int amCards, SDL_Event event, int amplayers, int GameSizeX, int GameSizeY)
 {
 	int Types[] = { 1, 2 };
-	int actcard = dist2card(event.button.x, event.button.y, Types, 2);
+	int actcard = dist2object(&objects, event.button.x, event.button.y, Types, 2);
 
 	if (objects[actcard].type == 2) // Button
 	{
 		switch (objects[actcard].button.Type) // Beenden
 		{
 		case 0: return -1;
-		case 1: Save_Game();
-			break;
+		case 1: Save_Game(amplayers, amCards, cards, GameSizeX, GameSizeY); break;
+		case 2: Load_Game(); break;
+		default:	break;
 		}
 	}
 	else
@@ -184,28 +222,7 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, SDL_Event event, int amplaye
 		default: break;
 		}
 	}
-	paint_screen();
-}
-
-int dist2card(int x, int y, int type[], int AmOfTypes)
-{
-	int i = 0;
-	while (!IS_NULL(objects[i]))
-	{
-		for (int j = 0; j < AmOfTypes; j++)
-		{
-			if (objects[i].enabled && !objects[i].card.visible && objects[i].type == type[j])
-			{
-				double xrel = x - objects[i].x;
-				double yrel = y - objects[i].y;
-				if (xrel > 0 && xrel < (objects[i].picture).picture->w)
-				if (yrel > 0 && yrel < (objects[i].picture).picture->h)
-					return i;
-			}
-		}
-		i++;
-	}
-	return -1;
+	paint_screen(_screen, &objects);
 }
 
 char* concat(char *s1, char *s2)
@@ -218,7 +235,7 @@ char* concat(char *s1, char *s2)
 	return result;
 }
 
-int init_game(int AmPlayers, struct Card stack[], int AmCards, int AmX, int AmY)
+int init_game(int AmPlayers, struct Card (*stack)[], int AmCards, int AmX, int AmY)
 {
 	FILE *f;
 	f = fopen("./resources/config.txt", "r");
@@ -319,25 +336,25 @@ int init_game(int AmPlayers, struct Card stack[], int AmCards, int AmX, int AmY)
 	for (int j = AmCards - 1; j; j--) {
 		int k = rand() % (j + 1);  /* random variable modulo remaining cards */
 		/* swap entries of fields i and j */
-		struct Card swap = stack[j];
-		stack[j] = stack[k];
-		stack[k] = swap;
+		struct Card swap = (*stack)[j];
+		(*stack)[j] = (*stack)[k];
+		(*stack)[k] = swap;
 	}
 
 	// Draw Cards on gamefield
 
 	int j = 0;
-	int SizeX = (*stack[0].picture).picture->w;
-	int SizeY = (*stack[0].picture).picture->h;
+	int SizeX = (*(*stack)[0].picture).picture->w;
+	int SizeY = (*(*stack)[0].picture).picture->h;
 
 	for (int x = 0; x < AmX; x++)
 	for (int y = 0; y < AmY; y++)
 	{
-		if ((*stack[j].picture).picture == NULL)
+		if ((*(*stack)[j].picture).picture == NULL)
 			break;
 
 		objects[i].type = 1; // objects is card
-		objects[i].card = stack[j++];
+		objects[i].card = (*stack)[j++];
 		objects[i].picture = *objects[i].card.picture;
 		objects[i].card.picture = &objects[i].picture;
 		objects[i].enabled = 1;
@@ -345,46 +362,6 @@ int init_game(int AmPlayers, struct Card stack[], int AmCards, int AmX, int AmY)
 		objects[i].y = Gamefield.y + Gamefield.h / AmY * y;
 		i++;
 	}
-
-	return 0;
-}
-
-
-int paint_screen()
-{
-	_screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE);
-	SDL_FillRect(_screen, NULL, _bg_color);
-
-	int i = 0;
-	while (!IS_NULL(objects[i]))
-	{
-		if (objects[i].enabled)
-		{
-			switch (objects[i].type)
-			{
-			case 1: // card
-				if (objects[i].card.visible)
-					SDL_BlitSurface(objects[i].picture.picture, NULL, _screen, Create_Rect_BO(objects[i], 0)); // Foreground of the card
-				else
-					SDL_BlitSurface((*Card_Background).picture, NULL, _screen, Create_Rect_BO(objects[i], 0)); // Background of the card
-				break;
-			case 2: // Button
-				if (objects[i].button.Clicked)
-					SDL_BlitSurface(objects[i].button.Clicked_Picture->picture, NULL, _screen, Create_Rect_BO(objects[i], 0)); // Draw a clicked button
-				else
-					SDL_BlitSurface(objects[i].button.Picture->picture, NULL, _screen, Create_Rect_BO(objects[i], 0)); // Foreground of the card
-
-				SDL_BlitSurface(objects[i].button.Text_Picture.picture, NULL, _screen, Create_Rect_BO(objects[i], 1)); // Text of the card
-				break;
-			default:
-				SDL_BlitSurface(objects[i].picture.picture, NULL, _screen, Create_Rect_BO(objects[i], 0)); // Draws everything else
-				break;
-			}
-		}
-		i++;
-	}
-
-	SDL_Flip(_screen);
 
 	return 0;
 }

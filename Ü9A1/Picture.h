@@ -3,16 +3,18 @@
 
 #pragma warning( disable : 4996 )
 
+#define FILENAME_LENGHT 200
+
 TTF_Font *font;
 
 struct Picture
 {
 	int ID;
 	SDL_Surface *picture;
-	char filename[1000];
+	char filename[FILENAME_LENGHT];
 };
 
-extern struct Picture load_picture(struct Picture p, char Filename[100]);
-extern struct Picture Create_Picture_By_Text(struct Picture p, char Text[1000], int Highlighted);
+extern struct Picture load_picture(struct Picture p, char Filename[FILENAME_LENGHT]);
+extern struct Picture Create_Picture_By_Text(struct Picture p, char Text[FILENAME_LENGHT], int Highlighted);
 
 #endif

@@ -7,7 +7,6 @@
 
 #define INITIALIZATION_FAILURE						-1
 #define NO_SCREEN									-2
-#define FAILED_LOADING_IMAGE						-3
 #define FAILED_LOADING_GAME_OBJECTS					-4
 #define TOO_MANY_PLAYERS							-5
 #define FONT_LOAD_FAILURE							-6
@@ -16,12 +15,16 @@
 #define FAILED_LOADING_PIC_BUTTON_ADDRESS			-9
 #define FAILED_LOADING_PIC_BUTTON_CLICKED_ADDRESS	-10
 #define FAILED_LOADING_BACKGROUND					-11
+#define	FAILED_LOADING_GAME							-12
+#define FAILED_LOADING_SAVEGAME						-14
+
+#define ARRAY_LENGTH	1000
+
 /** further definitions **/
 #define EXTENDED_VERSION
-Uint32 _bg_color;
 
 SDL_Surface *_screen;
 
-int start_game(int amplayers, struct Card stack[], int AmCards, int SizeX, int SizeY, struct Picture *BG);
+int start_game(int amplayers, struct Card (*stack)[], int AmCards, int SizeX, int SizeY, struct Picture *BG, int Loading_Game);
 
 #endif

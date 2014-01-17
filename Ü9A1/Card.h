@@ -4,6 +4,8 @@
 #include "Picture.h"
 
 #pragma warning( disable : 4996 )
+#define FAILED_LOADING_IMAGE			-3
+#define ARRAY_LENGTH	1000
 
 struct Card
 {
@@ -12,5 +14,8 @@ struct Card
 	int visible; // 0 = background of the card, 1 = foreground
 	struct Picture *picture;
 };
+
+int init_cards(struct Card (*cards)[], char FileName[]); // returns the amount of cards
+int Save_Cards(struct Card cards[], char FileName[]);
 
 #endif

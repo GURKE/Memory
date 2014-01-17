@@ -16,6 +16,9 @@ Sint16 x, y;
 Uint16 type; // 0 = hard/background, 1 = card, 2 = Button
 int enabled;
 
+int paint_screen(SDL_Surface *_screen, struct Object(*_objects)[]);
+int dist2object(struct Object (*_objects)[], int x, int y, int type[], int AmOfTypes);
+
 struct Picture picture;
 struct Picture *back_picture;
 struct Card card;
@@ -29,12 +32,72 @@ int IS_NULL(struct Object o)
 		return o.picture.picture == NULL ? 1 : 0;
 }
 
-SDL_Rect *Create_Rect_BO(struct Object o, int move) // Creates Rectangle of picture for the paint procedure
+SDL_Rect *Create_Rect_BO(struct Object *o, int move) // Creates Rectangle of picture for the paint procedure
 {
 	SDL_Rect *rect = (SDL_Rect *)malloc(sizeof(SDL_Rect));
-	(*rect).h = o.picture.picture->h;
-	(*rect).w = o.picture.picture->w;
-	(*rect).x = o.x + (move ? o.button.x : 0);
-	(*rect).y = o.y + (move ? o.button.y : 0);
+	(*rect).h = o->picture.picture->h;
+	(*rect).w = o->picture.picture->w;
+	(*rect).x = o->x + (move ? o->button.x : 0);
+	(*rect).y = o->y + (move ? o->button.y : 0);
 	return rect;
+}
+
+int paint_screen(SDL_Surface *_screen, struct Object (*_objects)[])
+{
+	_screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE);
+	SDL_FillRect(_screen, NULL, _bg_color);
+
+	int i = 0;
+	while (!IS_NULL((*_objects)[i]))
+	{
+		if ((*_objects)[i].enabled)
+		{
+			switch ((*_objects)[i].type)
+			{
+			case 1: // card
+				if ((*_objects)[i].card.visible)
+					SDL_BlitSurface((*_objects)[i].picture.picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 0)); // Foreground of the card
+				else
+					SDL_BlitSurface(Card_Background.picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 0)); // Background of the card
+				break;
+			case 2: // Button
+				if ((*_objects)[i].button.Clicked)
+					SDL_BlitSurface((*_objects)[i].button.Clicked_Picture->picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 0)); // Draw a clicked button
+				else
+					SDL_BlitSurface((*_objects)[i].button.Picture->picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 0)); // Foreground of the card
+
+				SDL_BlitSurface((*_objects)[i].button.Text_Picture.picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 1)); // Text of the card
+				break;
+			default:
+				SDL_BlitSurface((*_objects)[i].picture.picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 0)); // Draws everything else
+				break;
+			}
+		}
+		i++;
+	}
+
+	SDL_Flip(_screen);
+
+	return 0;
+}
+
+int dist2object(struct Object (*_objects)[], int x, int y, int type[], int AmOfTypes)
+{
+	int i = 0;
+	while (!IS_NULL((*_objects)[i]))
+	{
+		for (int j = 0; j < AmOfTypes; j++)
+		{
+			if ((*_objects)[i].enabled && !(*_objects)[i].card.visible && (*_objects)[i].type == type[j])
+			{
+				double xrel = x - (*_objects)[i].x;
+				double yrel = y - (*_objects)[i].y;
+				if (xrel > 0 && xrel < ((*_objects)[i].picture).picture->w)
+				if (yrel > 0 && yrel < ((*_objects)[i].picture).picture->h)
+					return i;
+			}
+		}
+		i++;
+	}
+	return -1;
 }

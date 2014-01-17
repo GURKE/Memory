@@ -8,6 +8,8 @@
 #include "Picture.h"
 
 SDL_Surface *load_img(const char *filename);
+struct Picture load_picture(struct Picture p, char Filename[FILENAME_LENGHT]);
+struct Picture Create_Picture_By_Text(struct Picture p, char Text[FILENAME_LENGHT], int Highlighted);
 
 int PictureID = 0;
 
@@ -20,24 +22,24 @@ SDL_Color textColorH = { 200, 200, 0 };
 
 int ID;
 SDL_Surface *picture;
-char filename[1000];
+char filename[FILENAME_LENGHT];
 
-struct Picture load_picture(struct Picture p, char Filename[100])
+struct Picture load_picture(struct Picture p, char Filename[FILENAME_LENGHT])
 {
 	p.ID = PictureID++;
-	strncpy(p.filename, Filename, 100);
+	strncpy(p.filename, Filename, FILENAME_LENGHT);
 	p.picture = load_img(Filename);
 	return p;
 }
 
-struct Picture Create_Picture_By_Text(struct Picture p, char Text[1000], int Highlighted)
+struct Picture Create_Picture_By_Text(struct Picture p, char Text[FILENAME_LENGHT], int Highlighted)
 {
 	p.ID = PictureID++;
-	strncpy(p.filename, Text, 1000);
+	strncpy(p.filename, Text, FILENAME_LENGHT);
 	if (Highlighted)
-		p.picture = TTF_RenderText_Solid(font, Text, textColorH);
+		p.picture = TTF_RenderText_Solid(font, p.filename, textColorH);
 	else
-		p.picture = TTF_RenderText_Solid(font, Text, textColor);
+		p.picture = TTF_RenderText_Solid(font, p.filename, textColor);
 	return p;
 }
 
