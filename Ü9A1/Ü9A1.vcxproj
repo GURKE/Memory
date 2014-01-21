@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClInclude Include="Button.h" />
     <ClInclude Include="Card.h" />
+    <ClInclude Include="Highscoreitem.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Picture.h" />
@@ -101,7 +102,9 @@
   <ItemGroup>
     <ClCompile Include="Button.c" />
     <ClCompile Include="Card.c" />
+    <ClCompile Include="Highscore.c" />
     <ClCompile Include="Game.c" />
+    <ClCompile Include="Highscoreitem.c" />
     <ClCompile Include="Object.c" />
     <ClCompile Include="Picture.c" />
     <ClCompile Include="stdafx.cpp" />

@@ -39,6 +39,9 @@
     <ClInclude Include="Button.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Highscoreitem.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -60,6 +63,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Button.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Highscoreitem.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Highscore.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

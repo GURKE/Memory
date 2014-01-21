@@ -27,18 +27,18 @@ struct Button button;
 int IS_NULL(struct Object o)
 {
 	if (o.type == 2) // Button
-		return o.button.Picture->picture == NULL ? 1 : 0;
+		return o.button.Picture.picture == NULL ? 1 : 0;
 	else
 		return o.picture.picture == NULL ? 1 : 0;
 }
 
-SDL_Rect *Create_Rect_BO(struct Object *o, int move) // Creates Rectangle of picture for the paint procedure
+SDL_Rect *Create_Rect_BO(struct Object *o) // Creates Rectangle of picture for the paint procedure
 {
 	SDL_Rect *rect = (SDL_Rect *)malloc(sizeof(SDL_Rect));
 	(*rect).h = o->picture.picture->h;
 	(*rect).w = o->picture.picture->w;
-	(*rect).x = o->x + (move ? o->button.x : 0);
-	(*rect).y = o->y + (move ? o->button.y : 0);
+	(*rect).x = o->x;
+	(*rect).y = o->y;
 	return rect;
 }
 
@@ -62,11 +62,10 @@ int paint_screen(SDL_Surface *_screen, struct Object (*_objects)[])
 				break;
 			case 2: // Button
 				if ((*_objects)[i].button.Clicked)
-					SDL_BlitSurface((*_objects)[i].button.Clicked_Picture->picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 0)); // Draw a clicked button
+					SDL_BlitSurface((*_objects)[i].button.Clicked_Picture.picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 0)); // Draw a clicked button
 				else
-					SDL_BlitSurface((*_objects)[i].button.Picture->picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 0)); // Foreground of the card
+					SDL_BlitSurface((*_objects)[i].button.Picture.picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 0)); // Foreground of the card
 
-				SDL_BlitSurface((*_objects)[i].button.Text_Picture.picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 1)); // Text of the card
 				break;
 			default:
 				SDL_BlitSurface((*_objects)[i].picture.picture, NULL, _screen, Create_Rect_BO(&(*_objects)[i], 0)); // Draws everything else
@@ -100,4 +99,28 @@ int dist2object(struct Object (*_objects)[], int x, int y, int type[], int AmOfT
 		i++;
 	}
 	return -1;
+}
+
+int Save_Objects(struct Object objects[], FILE *f)
+{
+	int i;
+	for (i = 0; !IS_NULL(objects[i]); i++)
+	{
+		fprintf(f, "%d %d %d %d", objects[i].x, objects[i].y, objects[i].enabled, objects[i].type);
+		Save_Picture(f, objects[i].picture);
+
+		switch (objects[i].type)
+		{
+		case THard:
+			break;
+		case TCard:
+			Save_Card(f, objects[i].card);
+			break;
+		case TButton:
+			Save_Button(f, objects[i].button);
+			break;
+		default:
+			break;
+		}
+	}
 }

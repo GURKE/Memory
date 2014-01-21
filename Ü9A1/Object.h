@@ -14,6 +14,10 @@
 Uint32 _bg_color;
 struct Picture Card_Background;
 
+#define THard 0
+#define TCard 1
+#define TButton 2
+
 struct Object
 {
 	int x, y;
@@ -29,5 +33,6 @@ int IS_NULL(struct Object o);
 SDL_Rect *Create_Rect_BO(struct Object *o, int move);
 int dist2object(struct Object *_objects[], int x, int y, int type[], int AmOfTypes);
 int paint_screen(SDL_Surface *_screen, struct Object(*_objects)[]);
+int Save_Objects(struct Object objects[], FILE *f);
 
 #endif

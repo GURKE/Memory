@@ -5,17 +5,21 @@
 
 #include "Picture.h"
 
+#define BExit 0
+#define BSave 1
+#define BStart 2
+#define BHighscore 3
+#define BContinue 4
+
 struct Button
 {
-	struct Picture *Picture;
-	struct Picture *Clicked_Picture;
-	struct Picture Text_Picture;
-	int x;
-	int y;
+	struct Picture Picture;
+	struct Picture Clicked_Picture;
 	int Clicked;
 	int Type; // 0 = exit, 1 = save, 2 = start
 };
 
-struct Button New_Button(struct Button b, struct Picture *Pic_Button, struct Picture *Pic_Button_Clicked, struct Picture Text_Picture);
+struct Button New_Button(struct Button b, char Text[]);
+int Save_Button(FILE *f, struct Button b);
 
 #endif

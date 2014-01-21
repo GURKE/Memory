@@ -8,8 +8,14 @@
 
 #include "card.h"
 
+int init_cards(struct Card(*cards)[], char FileName[]) // returns the amount of cards
+{
 
 
+}
+
+
+int Save_Card(FILE *f, struct Card c);
 
 struct sCard opencard(struct sCard ca)
 {
@@ -22,7 +28,7 @@ struct sCard opencard(struct sCard ca)
 	int pair;
 	char location[100];
 
-	/*switch(c)
+	switch(c)
 	{
 		case '0':
 	 	{
@@ -43,19 +49,8 @@ struct sCard opencard(struct sCard ca)
 		{		
 			ca.difficulty = easy; 			//invalid difficulty was read, valid values: 0, 1, 2 
 		}
-	}*/
+	}
 
 	ca.difficulty = c;
 	return ca;
 }
-
-
-
-	
-
-	Daten speicherst,  immer als string von 8-Bit Variablen ausgelesem,
-	 8-Bit Variablen entsprehcne immer ASCII-Char
-	Datei difficulty.txt auslesem, enthält nur ein Zeichen: '1'
-	FILE* reader = fopen("*\difficulty.txt");
-
-

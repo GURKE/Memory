@@ -16,5 +16,5 @@ struct Picture
 
 extern struct Picture load_picture(struct Picture p, char Filename[FILENAME_LENGHT]);
 extern struct Picture Create_Picture_By_Text(struct Picture p, char Text[FILENAME_LENGHT], int Highlighted);
-
+extern int Save_Picture(FILE *f, struct Picture p);
 #endif

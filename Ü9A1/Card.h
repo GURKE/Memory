@@ -16,6 +16,6 @@ struct Card
 };
 
 int init_cards(struct Card (*cards)[], char FileName[]); // returns the amount of cards
-int Save_Cards(struct Card cards[], char FileName[]);
+int Save_Card(FILE *f, struct Card c);
 
 #endif

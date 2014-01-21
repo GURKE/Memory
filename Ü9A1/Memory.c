@@ -27,11 +27,9 @@ struct Object objects[ARRAY_LENGTH];
 int init_card_background();
 int init_menu();
 
-
-
-struct Picture *Card_Background;
 struct Picture Pic_Button;
 struct Picture Pic_Button_Clicked;
+
 
 int main(int argc, char *argv[])
 {
@@ -68,7 +66,7 @@ int main(int argc, char *argv[])
 
 	_bg_color = SDL_MapRGB(_screen->format, 0, 0, 0); // Sets the backgroundcolor to black
 
-	PlaySound(L"./resources/music/Bioweapon - Heretic.wav", NULL, SND_LOOP | SND_ASYNC);
+	//PlaySound(L"./resources/music/Bioweapon - Heretic.wav", NULL, SND_LOOP | SND_ASYNC);
 
 	init_card_background();
 	init_cards(&cards[0], "./resources/cards/cards.txt");
@@ -88,9 +86,13 @@ int main(int argc, char *argv[])
 			{
 				if (objects[actobject].button.Type == 0) // Start game
 				{
-					int result = start_game(8, cards, 100, 10, 10, &card_background[0], 0);
+					int result = start_game(2, cards, 2, 7, 7, &card_background[0], 0);
 					if (result)
 						return result;
+				}
+				else if (objects[actobject].button.Type == BHighscore)
+				{
+
 				}
 			}
 		}
@@ -136,21 +138,16 @@ int init_menu(){
 	{
 		objects[i].type = 2;
 		objects[i].enabled = 1;
-		objects[i].picture = Pic_Button;
-
-		int x = 0, y = 0, w = 0, h = 0;
-		if (fscanf(f, "%d %d %d %d %s %d", &x, &y, &w, &h, &c, &objects[i].button.Type) == EOF)
+		
+		int x = 0, y = 0;
+		if (fscanf(f, "%d %d %s %d", &x, &y, &c, &objects[i].button.Type) == EOF)
 			return -1;
 
-		objects[i].button.Picture = (struct Picture *)malloc(sizeof(struct Picture));
-		objects[i].button.Clicked_Picture = (struct Picture *)malloc(sizeof(struct Picture));
-		objects[i].button.Text_Picture.picture = (struct Picture *)malloc(sizeof(struct Picture));
-			objects[i].button = New_Button(objects[i].button, &Pic_Button, &Pic_Button_Clicked, Create_Picture_By_Text(objects[i].button.Text_Picture, c, 0));
+		objects[i].button = New_Button(objects[i].button, c);
 
+		objects[i].picture = objects[i].button.Picture;
 		objects[i].x = x;
 		objects[i].y = y;
-		objects[i].button.x = w;
-		objects[i].button.y = h;
 
 		i++;
 	}

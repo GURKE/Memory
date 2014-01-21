@@ -40,7 +40,8 @@ int init_cards(struct Card (*cards)[], char FileName[])
 	return 0;
 }
 
-int Save_Cards(struct Card cards[], char FileName[])
+int Save_Card(FILE *f, struct Card c)
 {
-
+	printf(f, "%d %d %d", c.difficulty, c.type, c.visible);
+	return 0;
 }

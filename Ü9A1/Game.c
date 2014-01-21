@@ -38,6 +38,9 @@ int Load_Game();
 struct Object objects[ARRAY_LENGTH];
 
 int pairs[8];
+int NuOfRePairs;
+int PosOfReCards;
+
 int textfield[8][2]; // ID for the Textfields of: PlayerID, 2nd: 0-PlayerNumber, 1-Pairstext
 
 SDL_Rect PlayerPointsPosition[8];
@@ -122,7 +125,7 @@ int Save_Game(int amPlayers, int amCards, struct Card *cards[], int GameSizeX, i
 
 	fprintf(f, "%d %d %d %s", amPlayers, GameSizeX, GameSizeY, Card_Background.filename);
 
-	Save_Cards(cards, amCards, "Savegame_Cards.txt");
+	Save_Objects(objects, f);
 	
 	//objects
 	//Gamefield
@@ -200,29 +203,74 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int am
 
 				char *c = (char *)malloc(sizeof(char));
 				sprintf(c, "%d", pairs[AktPlayer]);
-				Create_Picture_By_Text(objects[textfield[AktPlayer][1]].picture, concat(c, " pairs found"), 0);
-			}
-			else
-			{
-				objects[*card1].card.visible = 0;
-				objects[*card2].card.visible = 0;
+				objects[textfield[AktPlayer][1]].picture = Create_Picture_By_Text(objects[textfield[AktPlayer][1]].picture, concat(c, " pairs found"), 0);
 
-				char *c = (char *)malloc(sizeof(char));
-				sprintf(c, "%d", AktPlayer + 1);
-				Create_Picture_By_Text(objects[textfield[AktPlayer][0]].picture, concat("Player ", c), 0);
+				NuOfRePairs--;
+				*c = (char *)malloc(sizeof(char));
+				sprintf(c, "%d", NuOfRePairs);
+				objects[PosOfReCards].picture = Create_Picture_By_Text(objects[PosOfReCards].picture, concat("Amount of remaining pairs: ", c), 0);
 
-				AktPlayer++;
-				if (AktPlayer == amplayers) AktPlayer = 0;
+				if (NuOfRePairs == 0)
+				{
+					int iwinner;
+					int iPairs = 0;
+					for (int i = 0; i < amplayers; i++)
+					if (pairs[i] > iPairs)
+					{
+						iwinner = i;
+						iPairs = pairs[iwinner];
+					}
 
-				sprintf(c, "%d", AktPlayer + 1);
-				Create_Picture_By_Text(objects[textfield[AktPlayer][0]].picture, concat("Player ", c), 1);
-			}
-			*mod = 0;
-			break;
+					int i = 0;
+					while (!IS_NULL(objects[i++]));
+					i--;
+					objects[i].type = 0;
+					objects[i].x = 300;
+					objects[i].y = 300;
+					objects[i].enabled = 1;
+
+					*c = (char *)malloc(sizeof(char));
+					sprintf(c, "%d", iPairs);
+					char *c2 = (char *)malloc(sizeof(char));
+					sprintf(c2, "%d", iwinner);
+					if (iPairs == 1)
+						objects[i].picture = Create_Picture_By_Text(objects[i].picture, concat(concat(concat("The Winner with ", c), " pair is Player "), c2), 0);
+					else
+						objects[i].picture = Create_Picture_By_Text(objects[i].picture, concat(concat(concat("The Winner with ", c), " pairs is Player "), c2), 0);
+
+					i++;
+					objects[i].type = 2;
+					objects[i].x = 300;
+					objects[i].y = 400;
+					objects[i].enabled = 1;
+					objects[i].button.Clicked = 0;
+					objects[i].button.Clicked_Picture = Create_Picture_By_Text(objects[i].button.Clicked_Picture, "Continue", 0);
+					objects[i].button.Picture = Create_Picture_By_Text(objects[i].button.Picture, "Continue", 0);
+					objects[i].picture = objects[i].button.Picture;
+					objects[i].button.Type = BContinue;
+				}
+				else
+				{
+					objects[*card1].card.visible = 0;
+					objects[*card2].card.visible = 0;
+
+					char *c = (char *)malloc(sizeof(char));
+					sprintf(c, "%d", AktPlayer + 1);
+					objects[textfield[AktPlayer][0]].picture = Create_Picture_By_Text(objects[textfield[AktPlayer][0]].picture, concat("Player ", c), 0);
+
+					AktPlayer++;
+					if (AktPlayer == amplayers) AktPlayer = 0;
+
+					sprintf(c, "%d", AktPlayer + 1);
+					objects[textfield[AktPlayer][0]].picture = Create_Picture_By_Text(objects[textfield[AktPlayer][0]].picture, concat("Player ", c), 1);
+				}
+				*mod = 0;
+				break;
 		default: break;
+			}
 		}
+		paint_screen(_screen, &objects);
 	}
-	paint_screen(_screen, &objects);
 }
 
 char* concat(char *s1, char *s2)
@@ -288,6 +336,22 @@ int init_game(int AmPlayers, struct Card (*stack)[], int AmCards, int AmX, int A
 		textfield[j][1] = i++;
 	}
 
+	int X, Y;
+	if (fscanf(f, "%d %d", &X, &Y) != EOF)
+	{
+		objects[i].x = X;
+		objects[i].y = Y;
+		objects[i].type = 0;
+		objects[i].enabled = 1;
+		char *c = (char *)malloc(sizeof(char));
+
+		NuOfRePairs = AmCards / 2; 
+		sprintf(c, "%d", NuOfRePairs);
+		objects[i].picture = Create_Picture_By_Text(objects[i].picture, concat("Number of remaining pairs: ", c), 0);
+
+		PosOfReCards = i++;
+	}
+
 	if (fscanf(f, "%s", &c) == EOF)
 		return FAILED_LOADING_PIC_BUTTON_ADDRESS;
 
@@ -303,18 +367,15 @@ int init_game(int AmPlayers, struct Card (*stack)[], int AmCards, int AmX, int A
 	{
 		objects[i].type = 2;
 		objects[i].enabled = 1;
-		objects[i].picture = Pic_Button;
 
-		int x = 0, y = 0, w = 0, h = 0;
-		if (fscanf(f, "%d %d %d %d %s %d", &x, &y, &w, &h, &c, &objects[i].button.Type) == EOF)
+		int x = 0, y = 0;
+		if (fscanf(f, "%d %d %s %d", &x, &y, &c, &objects[i].button.Type) == EOF)
 			return -1;
 
-		objects[i].button = New_Button(objects[i].button, &Pic_Button, &Pic_Button_Clicked, Create_Picture_By_Text(objects[i].button.Text_Picture, c, 0));
-	
+		objects[i].button = New_Button(objects[i].button, &Pic_Button, &Pic_Button_Clicked);
+		objects[i].picture = objects[i].button.Picture;
 		objects[i].x = x;
 		objects[i].y = y;
-		objects[i].button.x = w;
-		objects[i].button.y = h;
 
 		i++;
 	}

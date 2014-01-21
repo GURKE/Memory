@@ -1,9 +1,10 @@
 ./resources/Game_Background.bmp 0 0 0
-213 10 855 921
+213 80 855 851
 10 10 1093 10 10 242 1093 242 10 474 1093 474 10 706 1093 706	
+213 10
 ./resources/Button.bmp
 ./resources/Button_Clicked.bmp
-56 939 50 30 Close 0
-364 939 50 30 Save 1
-672 939 0 0 - -1
-980 939 0 0 - -1
+56 939 Close 0
+364 939 Save 1
+672 939 Load 2
+980 939 - -1

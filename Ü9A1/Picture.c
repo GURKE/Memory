@@ -43,6 +43,12 @@ struct Picture Create_Picture_By_Text(struct Picture p, char Text[FILENAME_LENGH
 	return p;
 }
 
+int Save_Picture(FILE *f, struct Picture p)
+{
+	fprintf(f, "%s %d", p.filename, p.ID);
+	return 0;
+}
+
 SDL_Surface * load_img(const char *filename) {
 	SDL_Surface* loadedImage = NULL;
 	SDL_Surface* optimizedImage = NULL;
