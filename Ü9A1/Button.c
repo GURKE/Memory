@@ -11,9 +11,10 @@
 #pragma warning( disable : 4996 )
 
 
-struct Button New_Button(struct Button b, char Text[])
+struct Button New_Button(struct Button b, char Text[], int Button_Type)
 {
 	b.Clicked = 0;
+	b.Type = Button_Type;
 	b.Picture = Create_Picture_By_Text(b.Picture, Text, 0);
 	b.Clicked_Picture = Create_Picture_By_Text(b.Clicked_Picture, Text, 1);
 

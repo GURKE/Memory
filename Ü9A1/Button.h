@@ -10,6 +10,7 @@
 #define BStart 2
 #define BHighscore 3
 #define BContinue 4
+#define BMainMenu 5
 
 struct Button
 {

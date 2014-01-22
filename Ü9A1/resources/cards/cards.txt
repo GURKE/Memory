@@ -1,2 +1,4 @@
 ./resources/cards/cardoo.bmp 0 0
 ./resources/cards/cardoo.bmp 0 0
+./resources/cards/cardoo.bmp 0 0
+./resources/cards/cardot.bmp 0 1

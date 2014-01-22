@@ -210,67 +210,66 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int am
 				sprintf(c, "%d", NuOfRePairs);
 				objects[PosOfReCards].picture = Create_Picture_By_Text(objects[PosOfReCards].picture, concat("Amount of remaining pairs: ", c), 0);
 
-				if (NuOfRePairs == 0)
+				if (NuOfRePairs == 0) // Game ends
 				{
-					int iwinner;
-					int iPairs = 0;
-					for (int i = 0; i < amplayers; i++)
-					if (pairs[i] > iPairs)
-					{
-						iwinner = i;
-						iPairs = pairs[iwinner];
-					}
-
-					int i = 0;
-					while (!IS_NULL(objects[i++]));
-					i--;
-					objects[i].type = 0;
-					objects[i].x = 300;
-					objects[i].y = 300;
-					objects[i].enabled = 1;
-
-					*c = (char *)malloc(sizeof(char));
-					sprintf(c, "%d", iPairs);
-					char *c2 = (char *)malloc(sizeof(char));
-					sprintf(c2, "%d", iwinner);
-					if (iPairs == 1)
-						objects[i].picture = Create_Picture_By_Text(objects[i].picture, concat(concat(concat("The Winner with ", c), " pair is Player "), c2), 0);
-					else
-						objects[i].picture = Create_Picture_By_Text(objects[i].picture, concat(concat(concat("The Winner with ", c), " pairs is Player "), c2), 0);
-
-					i++;
-					objects[i].type = 2;
-					objects[i].x = 300;
-					objects[i].y = 400;
-					objects[i].enabled = 1;
-					objects[i].button.Clicked = 0;
-					objects[i].button.Clicked_Picture = Create_Picture_By_Text(objects[i].button.Clicked_Picture, "Continue", 0);
-					objects[i].button.Picture = Create_Picture_By_Text(objects[i].button.Picture, "Continue", 0);
-					objects[i].picture = objects[i].button.Picture;
-					objects[i].button.Type = BContinue;
+					GameEnd(amplayers);
 				}
-				else
-				{
-					objects[*card1].card.visible = 0;
-					objects[*card2].card.visible = 0;
-
-					char *c = (char *)malloc(sizeof(char));
-					sprintf(c, "%d", AktPlayer + 1);
-					objects[textfield[AktPlayer][0]].picture = Create_Picture_By_Text(objects[textfield[AktPlayer][0]].picture, concat("Player ", c), 0);
-
-					AktPlayer++;
-					if (AktPlayer == amplayers) AktPlayer = 0;
-
-					sprintf(c, "%d", AktPlayer + 1);
-					objects[textfield[AktPlayer][0]].picture = Create_Picture_By_Text(objects[textfield[AktPlayer][0]].picture, concat("Player ", c), 1);
-				}
-				*mod = 0;
-				break;
-		default: break;
 			}
+			else
+			{
+				objects[*card1].card.visible = 0;
+				objects[*card2].card.visible = 0;
+
+				char *c = (char *)malloc(sizeof(char));
+				sprintf(c, "%d", AktPlayer + 1);
+				objects[textfield[AktPlayer][0]].picture = Create_Picture_By_Text(objects[textfield[AktPlayer][0]].picture, concat("Player ", c), 0);
+
+				AktPlayer++;
+				if (AktPlayer == amplayers) AktPlayer = 0;
+
+				sprintf(c, "%d", AktPlayer + 1);
+				objects[textfield[AktPlayer][0]].picture = Create_Picture_By_Text(objects[textfield[AktPlayer][0]].picture, concat("Player ", c), 1);
+			}
+			*mod = 0;
+			break;
+		default: break;
 		}
 		paint_screen(_screen, &objects);
 	}
+}
+
+int GameEnd(int amPlayers)
+{
+	int iwinner;
+	int iPairs = 0;
+	for (int i = 0; i < amPlayers; i++)
+	if (pairs[i] > iPairs)
+	{
+		iwinner = i;
+		iPairs = pairs[iwinner];
+	}
+
+	int i = 0;
+	while (!IS_NULL(objects[i++]));
+	i--;
+
+	char c[100];
+
+	char *c2 = (char *)malloc(sizeof(char));
+	sprintf(c2, "%d", iPairs);
+	concat("The Winner with ", c2);
+	if (iPairs == 1)
+		concat(c, " pair is Player ");
+	else
+		concat(c, " pairs is Player ");
+	
+	sprintf(c2, "%d", iwinner);
+	concat(c, c2);
+
+	objects[i] = O_New_Label(objects[i], c, 300, 300);
+
+	i++;
+	objects[i] = O_New_Button(objects[i], "Continue", BContinue, 300, 400);
 }
 
 char* concat(char *s1, char *s2)

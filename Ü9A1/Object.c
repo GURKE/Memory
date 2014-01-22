@@ -9,6 +9,7 @@
 #include "Card.h"
 #include "Picture.h"
 #include "Button.h"
+#include "Label.h"
 
 #pragma warning( disable : 4996 )
 
@@ -23,6 +24,7 @@ struct Picture picture;
 struct Picture *back_picture;
 struct Card card;
 struct Button button;
+struct Label label;
 
 int IS_NULL(struct Object o)
 {
@@ -123,4 +125,26 @@ int Save_Objects(struct Object objects[], FILE *f)
 			break;
 		}
 	}
+}
+
+struct Object O_New_Button(struct Object O, char Text[], int Button_Type, int X, int Y)
+{
+	O.button = New_Button(O.button, Text, Button_Type);
+	O.enabled = 1;
+	O.picture = O.button.Picture;
+	O.type = TButton;
+	O.x = X;
+	O.y = Y;
+	return O;
+}
+
+struct Object O_New_Label(struct Object O, char Text[], int X, int Y)
+{
+	strcpy(O.label.Text, Text);
+	O.enabled = 1;
+	O.picture = Create_Picture_By_Text(O.picture, Text, 0);
+	O.type = TLabel;
+	O.x = X;
+	O.y = Y;
+	return O;
 }
