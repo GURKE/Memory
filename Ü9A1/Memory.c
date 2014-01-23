@@ -9,7 +9,7 @@
 #include "memory.h"
 #include "Card.h"
 #include "Picture.h"
-#include "Object.h"
+#include "Objectmanager.h"
 #include "Highscore.h"
 
 #pragma warning( disable : 4996 )
@@ -24,23 +24,14 @@
 struct Picture card_background[ARRAY_LENGTH];
 struct Card cards[ARRAY_LENGTH];
 
-#define Number_Of_Menues 2
-
-struct Object objects[Number_Of_Menues][ARRAY_LENGTH];
-
-
-#define MAIN_MENU 0
-#define HIGH_SCORE 1
-
-int Akt_Menu = 0;
-
+struct Objectmanager oman;
 
 int init_card_background();
 int init_menu();
 int Paint_Highscore();
 
-int Buttons[Number_Of_Menues][ARRAY_LENGTH];
-int NumberOfButtons[Number_Of_Menues];
+
+int SoundOn = 1;
 
 int main(int argc, char *argv[])
 {
@@ -77,7 +68,7 @@ int main(int argc, char *argv[])
 
 	_bg_color = SDL_MapRGB(_screen->format, 0, 0, 0); // Sets the backgroundcolor to black
 
-	//PlaySound(L"./resources/music/Bioweapon - Heretic.wav", NULL, SND_LOOP | SND_ASYNC);
+	PlaySound(L"./resources/music/Bioweapon - Heretic.wav", NULL, SND_LOOP | SND_ASYNC);
 
 	init_card_background();
 	init_cards(&cards[0], "./resources/cards/cards.txt");
@@ -85,50 +76,55 @@ int main(int argc, char *argv[])
 	
 	SDL_Event event;
 
-	int Akt_Button = -1;
 
 	while (SDL_WaitEvent(&event))
 	{
 		if (event.type == SDL_QUIT)
 			break;
-		
-		char* c = (char*)malloc(10*sizeof(char));
-		sprintf(c, "%d", event.key.keysym.sym);
-		SDL_WM_SetCaption(c, NULL);
 
 		if ((event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) || (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN))
 		{
 			int actobject;
-			if (event.key.keysym.sym == SDLK_RETURN && Akt_Button > -1)
+			if (event.key.keysym.sym == SDLK_RETURN && oman.Akt_Button > -1)
 			{
-				actobject = Buttons[Akt_Menu][Akt_Button];
+				actobject = oman.Akt_Button;
 			}
 			else
 			{
 				int Types[] = { 2 };
-				actobject = dist2object(&objects[Akt_Menu], event.button.x, event.button.y, Types, 1);
+				actobject = dist2object(event.button.x, event.button.y, Types, 1);
 			}
 
 			if (actobject > -1)
 			{
-				if (objects[Akt_Menu][actobject].button.Type == BStart) // Start game
+				if (oman.objects[oman.Akt_Menu][actobject].button.Type == BStart) // Start game
 				{
 					int result = start_game(2, cards, 4, 7, 7, &card_background[0], 0);
 					if (result)
 						return result;
 				}
-				else if (objects[Akt_Menu][actobject].button.Type == BHighscore)
+				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BHighscore)
 				{
-					Akt_Menu = HIGH_SCORE;
 					Paint_Highscore();
-					paint_screen(_screen, &objects[Akt_Menu]);
+					Chane_Menu(HIGH_SCORE, &oman.Akt_Button);
 				}
-				else if (objects[Akt_Menu][actobject].button.Type == BMainMenu)
+				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BMainMenu)
 				{
-					Akt_Menu = MAIN_MENU;
-					paint_screen(_screen, &objects[Akt_Menu]);
+					Chane_Menu(MAIN_MENU, &oman.Akt_Button);
 				}
-				else if (objects[Akt_Menu][actobject].button.Type == BExit)
+				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BConfigurations)
+				{
+					Chane_Menu(CONFIGURATIONS, &oman.Akt_Button);
+				}
+				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BSoundOn)
+				{
+					PlaySound(L"./resources/music/Bioweapon - Heretic.wav", NULL, SND_LOOP | SND_ASYNC);
+				}
+				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BSoundOff)
+				{
+					PlaySound(NULL, NULL, SND_LOOP | SND_ASYNC);
+				}
+				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BExit)
 				{
 					return 0;
 				}
@@ -138,49 +134,49 @@ int main(int argc, char *argv[])
 		{
 			// Check for the button
 			int Types[] = { 2 };
-			int newbutton = dist2object(&objects, event.button.x, event.button.y, Types, 1);
+			int newbutton = dist2object(oman.Akt_Menu, event.button.x, event.button.y, Types, 1);
 			if (newbutton > -1)
 			{
-				if (newbutton != Akt_Button)
+				if (newbutton != oman.Akt_Button)
 				{
-					objects[Akt_Menu][newbutton].button.Clicked = 1;
-					Akt_Button = newbutton;
+					oman.objects[oman.Akt_Menu][newbutton].button.Clicked = 1;
+					oman.Akt_Button = newbutton;
 				}
 			}
-			else if (Akt_Button > -1) // Reset clicked button, after mouse left it
+			else if (oman.Akt_Button > -1) // Reset clicked button, after mouse left it
 			{
-				objects[Akt_Menu][Akt_Button].button.Clicked = 0;
-				Akt_Button = -1;
+				oman.objects[oman.Akt_Menu][oman.Akt_Button].button.Clicked = 0;
+				oman.Akt_Button = -1;
 			}
-			paint_screen(_screen, &objects);			
+			paint_screen(_screen, oman.Akt_Menu);
 		}
 		else if (event.type == SDL_KEYDOWN)
 		{
 			if (event.key.keysym.sym == SDLK_DOWN)
 			{
-				if (Akt_Button > -1)
-					objects[Akt_Menu][Buttons[Akt_Menu][Akt_Button]].button.Clicked = 0;
+				if (oman.Akt_Button > -1)
+					oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 0;
 
-				Akt_Button++;
-				if (Akt_Button >= NumberOfButtons[Akt_Menu])
-					Akt_Button = 0;
+				oman.Akt_Button++;
+				if (oman.Akt_Button >= oman.NumberOfButtons[oman.Akt_Menu])
+					oman.Akt_Button = 0;
 
-				objects[Akt_Menu][Buttons[Akt_Menu][Akt_Button]].button.Clicked = 1;
+				oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 1;
 
-				paint_screen(_screen, &objects[Akt_Menu]);
+				paint_screen(_screen, oman.Akt_Menu);
 			}
 			else if (event.key.keysym.sym == SDLK_UP)
 			{
-				if (Akt_Button > -1)
-					objects[Akt_Menu][Buttons[Akt_Menu][Akt_Button]].button.Clicked = 0;
+				if (oman.Akt_Button > -1)
+					oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 0;
 
-				Akt_Button--;
-				if (Akt_Button < 0)
-					Akt_Button = NumberOfButtons[Akt_Menu] - 1;
+				oman.Akt_Button--;
+				if (oman.Akt_Button < 0)
+					oman.Akt_Button = oman.NumberOfButtons[oman.Akt_Menu] - 1;
 
-				objects[Akt_Menu][Buttons[Akt_Menu][Akt_Button]].button.Clicked = 1;
+				oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 1;
 
-				paint_screen(_screen, &objects);
+				paint_screen(_screen, oman.Akt_Menu);
 			}
 		}
 	}
@@ -191,18 +187,29 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+int Chane_Menu(int Menu, int *Akt_Button)
+{
+	oman.objects[oman.Akt_Menu][*Akt_Button].button.Clicked = 0;
+	*Akt_Button = -1;
+
+	oman.Akt_Menu = Menu;
+	
+	paint_screen(_screen, oman.Akt_Menu);
+	return -1;
+}
+
 int Paint_Highscore()
 {
 	int i = 0;
-	while (!IS_NULL(objects[Akt_Menu][i])) 
+	while (!IS_NULL(oman.objects[oman.Akt_Menu][i]))
 	{
-		if (objects[Akt_Menu][i].type == THighscoreitem)
-			objects[Akt_Menu][i].enabled = 0;
+		if (oman.objects[HIGH_SCORE][i].type == THighscoreitem)
+			oman.objects[HIGH_SCORE][i].enabled = 0;
 		i++;
 	}
 	struct Object *o = GetHighscoreItems();
 	for (int j = 0; j < HS_LENGTH * 2; j++)
-		objects[Akt_Menu][i++] = *(o++);
+		oman.objects[HIGH_SCORE][i++] = *(o++);
 
 	return -1;
 }
@@ -212,78 +219,15 @@ int init_menu()
 	// Reset objects
 	for (int j = 0; j < Number_Of_Menues; j++)
 	for (int i = 0; i < ARRAY_LENGTH; i++)
-		objects[j][i].picture.picture = NULL;
+		oman.objects[j][i].picture.picture = NULL;
 
 	FILE *f;
 	f = fopen("./resources/menu_config.txt", "r");	
-	// Loading Background
-	char c[100];
-
+	
 	// Load the different Menues
+	oman = Load_Objects(oman, f);
 
-	int AM = 0;
-	while (fscanf(f, "%d", &AM) != EOF)
-	{
-		int i = 0;
-		// Load the buttons
-		fscanf(f, "%s", &c);
-		if (c[0] == 'B')
-		{
-			fscanf(f, "%d", &NumberOfButtons[AM]);
-
-			for (int j = 0; j < NumberOfButtons[AM]; j++)
-			{
-				int x = 0, y = 0, Type = 0;
-				if (fscanf(f, "%d %d %s %d", &x, &y, &c, &Type) == EOF)
-					return -1;
-
-				objects[AM][i] = O_New_Button(objects[AM][i], c, Type, x, y);
-				Buttons[AM][j] = i;
-
-				i++;
-			}
-			fscanf(f, "%s", &c);
-		}
-
-		if (c[0] == 'O')
-		{
-			int NumberOfObjects = 0;
-			fscanf(f, "%d", &NumberOfObjects);
-			for (int j = 0; j < NumberOfObjects; j++)
-			{
-				if (fscanf(f, "%s %d %d %d", &c, &objects[AM][i].x, &objects[AM][i].y, &objects[AM][i].type) == EOF)
-					return -1;
-
-				objects[AM][i].picture = load_picture(objects[AM][i].picture, c);
-				if (objects[AM][i].picture.picture == NULL)
-					return FAILED_LOADING_BACKGROUND;
-
-				objects[AM][i].enabled = 1;
-				i++;
-			}
-			fscanf(f, "%s", &c);
-		}
-
-		if (c[0] == 'L')
-		{
-			int NumberOfLabel = 0;
-			fscanf(f, "%d", &NumberOfLabel);
-			for (int j = 0; j < NumberOfLabel; j++)
-			{
-				if (fscanf(f, "%d %d %s", &objects[AM][i].x, &objects[AM][i].y, &objects[AM][i].label.Text) == EOF)
-					return -1;
-
-				objects[AM][i].picture = Create_Picture_By_Text(objects[AM][i].picture, objects[AM][i].label.Text, 0);
-				if (objects[AM][i].picture.picture == NULL)
-					return FAILED_LOADING_BACKGROUND;
-
-				objects[AM][i].enabled = 1;
-				i++;
-			}
-		}
-	}
-
-	paint_screen(_screen, &objects[Akt_Menu]);
+	paint_screen(_screen, oman.Akt_Menu);
 }
 
 int init_card_background()

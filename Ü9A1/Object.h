@@ -20,6 +20,9 @@ struct Picture Card_Background;
 #define TButton 2
 #define TLabel 3
 #define THighscoreitem 4
+#define TTextbox 5
+
+#define FAILED_LOADING_BACKGROUND					-11
 
 struct Object
 {
@@ -35,8 +38,6 @@ struct Object
 
 int IS_NULL(struct Object o);
 SDL_Rect *Create_Rect_BO(struct Object *o, int move);
-int dist2object(struct Object *_objects[], int x, int y, int type[], int AmOfTypes);
-int paint_screen(SDL_Surface *_screen, struct Object(*_objects)[]);
 int Save_Objects(struct Object objects[], FILE *f);
 struct Object O_New_Button(struct Object O, char Text[], int Button_Type, int X, int Y);
 struct Object O_New_Label(struct Object O, char Text[], int X, int Y);

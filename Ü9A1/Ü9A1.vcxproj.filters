@@ -48,6 +48,9 @@
     <ClInclude Include="Highscore.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Objectmanager.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -78,6 +81,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Label.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Objectmanager.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

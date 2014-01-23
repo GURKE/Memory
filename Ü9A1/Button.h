@@ -11,6 +11,11 @@
 #define BHighscore 3
 #define BContinue 4
 #define BMainMenu 5
+#define BConfigurations 6
+#define BSoundOn 7
+#define BSoundOff 8
+#define BBackground 9
+
 
 struct Button
 {
