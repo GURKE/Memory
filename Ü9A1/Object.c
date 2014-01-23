@@ -17,7 +17,6 @@ Sint16 x, y;
 Uint16 type; // 0 = hard/background, 1 = card, 2 = Button
 int enabled;
 
-
 struct Picture picture;
 struct Picture *back_picture;
 struct Card card;

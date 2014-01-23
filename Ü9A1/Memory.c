@@ -11,6 +11,7 @@
 #include "Picture.h"
 #include "Objectmanager.h"
 #include "Highscore.h"
+#include "Object.h"
 
 #pragma warning( disable : 4996 )
 #pragma comment(lib, "winmm.lib") // For the sound
@@ -48,15 +49,15 @@ int main(int argc, char *argv[])
 		return NO_SCREEN;
 	}
 
-	//Initialize SDL_ttf 
+	//Initialize SDL_ttf
 	if (TTF_Init() == -1)
 	{
 		fprintf(stderr, "SDL_TTF konnte nicht initialisiert werden:  %s\n", TTF_GetError());
 		return INITIALIZATION_FAILURE;
 	}
-	//Set the window caption 
+	//Set the window caption
 
-	SDL_WM_SetCaption("Mathe Memory", NULL); 
+	SDL_WM_SetCaption("Mathe Memory", NULL);
 
 	// Loads the Font
 	font = TTF_OpenFont("./resources/lazy.ttf", 28);
@@ -73,9 +74,8 @@ int main(int argc, char *argv[])
 	init_card_background();
 	init_cards(&cards[0], "./resources/cards/cards.txt");
 	init_menu();
-	
-	SDL_Event event;
 
+	SDL_Event event;
 
 	while (SDL_WaitEvent(&event))
 	{
@@ -128,6 +128,10 @@ int main(int argc, char *argv[])
 				{
 					return 0;
 				}
+				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BArrow_Left_1)
+                {
+                    //Befehl
+                }
 			}
 		}
 		else if (event.type == SDL_MOUSEMOTION)
@@ -193,7 +197,7 @@ int Chane_Menu(int Menu, int *Akt_Button)
 	*Akt_Button = -1;
 
 	oman.Akt_Menu = Menu;
-	
+
 	paint_screen(_screen, oman.Akt_Menu);
 	return -1;
 }
@@ -221,11 +225,8 @@ int init_menu()
 	for (int i = 0; i < ARRAY_LENGTH; i++)
 		oman.objects[j][i].picture.picture = NULL;
 
-	FILE *f;
-	f = fopen("./resources/menu_config.txt", "r");	
-	
 	// Load the different Menues
-	oman = Load_Objects(oman, f);
+	oman = Load_Objects(oman, "./resources/menu_config.txt");
 
 	paint_screen(_screen, oman.Akt_Menu);
 }

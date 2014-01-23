@@ -5,6 +5,7 @@
 #include <time.h>
 #include <SDL_ttf.h>
 #include <Windows.h>
+
 #include "Objectmanager.h"
 #include "Object.h"
 #include "Card.h"
@@ -18,13 +19,16 @@ int NumberOfButtons[Number_Of_Menues];
 
 int paint_screen(SDL_Surface *_screen);
 int dist2object(int x, int y, int type[], int AmOfTypes);
-struct Objectmanager Load_Objects(struct Objectmanager oman, FILE *f);
+struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[]);
 
 int Akt_Menu = 0;
 int Akt_Button = -1;
 
-struct Objectmanager Load_Objects(struct Objectmanager oman, FILE *f)
+struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[])
 {
+	FILE *f;
+	f = fopen(Filename, "r");
+
 	int AM = 0;
 	while (fscanf(f, "%d", &AM) != EOF)
 	{

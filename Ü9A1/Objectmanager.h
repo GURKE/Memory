@@ -21,7 +21,7 @@ struct Objectmanager
 	int Akt_Button;
 };
 
-struct Objectmanager Load_Objects(struct Objectmanager oman, FILE *f);
+struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[]);
 int paint_screen(SDL_Surface *_screen);
 int dist2object(int x, int y, int type[], int AmOfTypes);
 
