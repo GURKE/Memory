@@ -63,6 +63,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SDL.lib;SDLmain.lib;SDL_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>10000000</StackReserveSize>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -99,6 +100,7 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="Objectmanager.h" />
     <ClInclude Include="Picture.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -112,6 +114,7 @@
     <ClCompile Include="Object.c" />
     <ClCompile Include="Objectmanager.c" />
     <ClCompile Include="Picture.c" />
+    <ClCompile Include="Player.c" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Memory.c" />
   </ItemGroup>

@@ -10,6 +10,8 @@
 #include "Card.h"
 #include "Object.h"
 #include "Picture.h"
+#include "Objectmanager.h"
+#include "Player.h"
 
 #pragma warning( disable : 4996 )
 #pragma comment(lib, "winmm.lib") // For the sound
@@ -27,23 +29,20 @@
 SDL_Rect Gamefield;
 
 /* function declarations */
-int init_game(int AmPlayers, struct Card (*stack)[], int AmCards, int AmX, int AmY);
-int start_game(int amplayers, int card_background_id, struct Card (*stack)[], int AmCards, int SizeX, int SizeY, int Loading_Game);
+int init_game(int AmPlayers, struct Card (*stack)[], int AmCards);
+int start_game(int amplayers, struct Card(*stack)[], int AmCards, int SizeX, int SizeY, struct Picture *BG, int Loading_Game, struct Player _players[]);
 int paint_screen();
 char* concat(char *s1, char *s2);
 int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int amCards, SDL_Event event, int amplayers);
 int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayers);
 int Save_Game(int amPlayers, struct Card *cards[]);
 int Load_Game();
-struct Object objects[ARRAY_LENGTH];
+int UpdateRemainingCards(int AmCards);
 
-int pairs[8];
-int NuOfRePairs;
-int PosOfReCards;
+//struct Object objects[ARRAY_LENGTH];
 
-int textfield[8][2]; // ID for the Textfields of: PlayerID, 2nd: 0-PlayerNumber, 1-Pairstext
-
-SDL_Rect PlayerPointsPosition[8];
+int NuOfRePairs;  // amount of the remaining cards
+int PosOfReCards; // ID of the object for the label of the reamaining cards
 
 struct Button *Buttons[4];
 
@@ -51,10 +50,14 @@ int AktPlayer;
 
 int ClickedButton = -1;
 
+
 struct Picture Pic_Button;
 struct Picture Pic_Button_Clicked;
 
-int start_game(int amplayers, struct Card (*stack)[], int AmCards, int SizeX, int SizeY, struct Picture *BG, int Loading_Game)
+struct Objectmanager oman2;
+struct Player Players[8];
+
+int start_game(int amplayers, struct Card (*stack)[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[])
 {
 	// SizeX && SizeY are the amount of Cards in x and y direction on the gamefield
 	Card_Background = *BG;
@@ -71,12 +74,15 @@ int start_game(int amplayers, struct Card (*stack)[], int AmCards, int SizeX, in
 	
 	if (amplayers > 8)
 		return TOO_MANY_PLAYERS;
+	
+	for (size_t i = 0; i < amplayers; i++)
+		Players[i] = _players[i];
 
-	int result = init_game(amplayers, stack, AmCards, SizeX, SizeY);
+	int result = init_game(amplayers, stack, AmCards);
 	if (result)
 		return result;
 
-	paint_screen(_screen, &objects);
+	paint_screen(_screen, oman2.objects[oman2.Akt_Menu]);
 	
 	while (SDL_WaitEvent(&event))
 	{
@@ -84,7 +90,7 @@ int start_game(int amplayers, struct Card (*stack)[], int AmCards, int SizeX, in
 			break;
 		if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
 		{
-			int result = Mouse_Clicked(mod, card1, card2, &stack, AmCards, event, amplayers, SizeX, SizeY);
+			int result = Mouse_Clicked(mod, card1, card2, &stack, AmCards, event, amplayers);
 			if (result == -1)
 				break;
 
@@ -100,32 +106,32 @@ int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayer
 {
 	// Check for the button
 	int Types[] = { 2 };
-	int actbutton = dist2object(&objects, event.button.x, event.button.y, Types, 1);
+	int actbutton = dist2object(oman2.objects[oman2.Akt_Menu], event.button.x, event.button.y, Types, 1);
 	if (actbutton > -1)
 	{
 		if (actbutton != ClickedButton)
 		{
-			objects[actbutton].button.Clicked = 1;
+			oman2.objects[oman2.Akt_Menu][actbutton].button.Clicked = 1;
 			ClickedButton = actbutton;
 		}
 	}
 	else if (ClickedButton > -1) // Reset clicked button, after mouse left it
 	{
-		objects[ClickedButton].button.Clicked = 0;
+		oman2.objects[oman2.Akt_Menu][ClickedButton].button.Clicked = 0;
 		ClickedButton = -1;
 	}
-	paint_screen(_screen, &objects);
+	paint_screen(_screen, oman2.objects[oman2.Akt_Menu]);
 }
 
-int Save_Game(int amPlayers, int amCards, struct Card *cards[], int GameSizeX, int GameSizeY)
+int Save_Game(int amPlayers, int amCards, struct Card *cards[])
 {
 	FILE *f = fopen("Savegame.txt", "w");
 	if (fprintf(f, "") == EOF)
 		return -1;
 
-	fprintf(f, "%d %d %d %s", amPlayers, GameSizeX, GameSizeY, Card_Background.filename);
+	fprintf(f, "%d %s", amPlayers, Card_Background.filename);
 
-	Save_Objects(objects, f);
+	Save_Objects(oman2.objects[oman2.Akt_Menu], f);
 	
 	//objects
 	//Gamefield
@@ -156,22 +162,24 @@ int Load_Game()
 
 	Card_Background = load_picture(Card_Background, FileName);
 
-	start_game(amPlayers, cards, amCards, GameSizeX, GameSizeY, &Card_Background, 1);
+
+	
+	start_game(amPlayers, cards, amCards, GameSizeX, GameSizeY, &Card_Background, 1, Players);
 
 	return 0;
 }
 
-int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int amCards, SDL_Event event, int amplayers, int GameSizeX, int GameSizeY)
+int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int amCards, SDL_Event event, int amplayers)
 {
 	int Types[] = { 1, 2 };
-	int actcard = dist2object(&objects, event.button.x, event.button.y, Types, 2);
+	int actcard = dist2object(oman2.objects[oman2.Akt_Menu], event.button.x, event.button.y, Types, 2);
 
-	if (objects[actcard].type == 2) // Button
+	if (oman2.objects[oman2.Akt_Menu][actcard].type == 2) // Button
 	{
-		switch (objects[actcard].button.Type) // Beenden
+		switch (oman2.objects[oman2.Akt_Menu][actcard].button.Type) // Beenden
 		{
-		case 0: return -1;
-		case 1: Save_Game(amplayers, amCards, cards, GameSizeX, GameSizeY); break;
+		case 12: Change_Menu(&oman2, _screen, EXIT, &oman2.Akt_Button); break;
+		case 1: Save_Game(amplayers, amCards, cards); break;
 		case 2: Load_Game(); break;
 		default:	break;
 		}
@@ -181,34 +189,34 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int am
 		switch (*mod)
 		{
 		case 0:	case 1: // tap card
-			if (actcard > -1 && objects[actcard].enabled && !objects[actcard].card.visible)
+			if (actcard > -1 && oman2.objects[oman2.Akt_Menu][actcard].enabled && !oman2.objects[oman2.Akt_Menu][actcard].card.visible)
 			{
 				if (*mod == 0)
 					*card1 = actcard;
 				else
 					*card2 = actcard;
 
-				objects[actcard].card.visible = 1;
+				oman2.objects[oman2.Akt_Menu][actcard].card.visible = 1;
 				(*mod)++;
 			}
 			break;
 
 		case 2: // Remove them or move them back
-			if (objects[*card1].card.type == objects[*card2].card.type)
-			{
-				objects[*card1].enabled = 0;
-				objects[*card2].enabled = 0;
+			if (oman2.objects[oman2.Akt_Menu][*card1].card.type == oman2.objects[oman2.Akt_Menu][*card2].card.type)
+			{ // Pair found
+				oman2.objects[oman2.Akt_Menu][*card1].enabled = 0;
+				oman2.objects[oman2.Akt_Menu][*card2].enabled = 0;
 
-				pairs[AktPlayer]++;
+				Players[AktPlayer].FoundPairs++;
 
 				char *c = (char *)malloc(sizeof(char));
-				sprintf(c, "%d", pairs[AktPlayer]);
-				objects[textfield[AktPlayer][1]].picture = Create_Picture_By_Text(objects[textfield[AktPlayer][1]].picture, concat(c, " pairs found"), 0);
+				sprintf(c, "%d", Players[AktPlayer].FoundPairs);
+				Players[AktPlayer].ObPlayerPoints->picture = Create_Picture_By_Text(Players[AktPlayer].ObPlayerPoints->picture, concat(c, " pairs found"), 0);
 
 				NuOfRePairs--;
 				*c = (char *)malloc(sizeof(char));
 				sprintf(c, "%d", NuOfRePairs);
-				objects[PosOfReCards].picture = Create_Picture_By_Text(objects[PosOfReCards].picture, concat("Amount of remaining pairs: ", c), 0);
+				oman2.objects[oman2.Akt_Menu][PosOfReCards].picture = Create_Picture_By_Text(oman2.objects[oman2.Akt_Menu][PosOfReCards].picture, concat("Amount of remaining pairs: ", c), 0);
 
 				if (NuOfRePairs == 0) // Game ends
 				{
@@ -216,25 +224,25 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int am
 				}
 			}
 			else
-			{
-				objects[*card1].card.visible = 0;
-				objects[*card2].card.visible = 0;
+			{ // No pair found
+				oman2.objects[oman2.Akt_Menu][*card1].card.visible = 0;
+				oman2.objects[oman2.Akt_Menu][*card2].card.visible = 0;
 
 				char *c = (char *)malloc(sizeof(char));
 				sprintf(c, "%d", AktPlayer + 1);
-				objects[textfield[AktPlayer][0]].picture = Create_Picture_By_Text(objects[textfield[AktPlayer][0]].picture, concat("Player ", c), 0);
+				Players[AktPlayer].ObPlayername->picture = Create_Picture_By_Text(Players[AktPlayer].ObPlayername->picture, Players[AktPlayer].Name, 0);
 
 				AktPlayer++;
 				if (AktPlayer == amplayers) AktPlayer = 0;
 
 				sprintf(c, "%d", AktPlayer + 1);
-				objects[textfield[AktPlayer][0]].picture = Create_Picture_By_Text(objects[textfield[AktPlayer][0]].picture, concat("Player ", c), 1);
+				Players[AktPlayer].ObPlayername->picture = Create_Picture_By_Text(Players[AktPlayer].ObPlayername->picture, Players[AktPlayer].Name, 1);
 			}
 			*mod = 0;
 			break;
 		default: break;
 		}
-		paint_screen(_screen, &objects);
+		paint_screen(_screen, oman2.objects[oman2.Akt_Menu]);
 	}
 }
 
@@ -243,33 +251,36 @@ int GameEnd(int amPlayers)
 	int iwinner;
 	int iPairs = 0;
 	for (int i = 0; i < amPlayers; i++)
-	if (pairs[i] > iPairs)
+	if (Players[i].FoundPairs > iPairs)
 	{
 		iwinner = i;
-		iPairs = pairs[iwinner];
+		iPairs = Players[i].FoundPairs;
 	}
 
 	int i = 0;
-	while (!IS_NULL(objects[i++]));
+	while (!IS_NULL(oman2.objects[oman2.Akt_Menu][i++]));
 	i--;
 
 	char c[100];
+	c[0] = '\0';
+	strcat(&c, &"The Winner with ");
 
-	char *c2 = (char *)malloc(sizeof(char));
-	sprintf(c2, "%d", iPairs);
-	concat("The Winner with ", c2);
+	char c2[100];
+	sprintf(&c2, "%d", iPairs);
+	strcat(&c, &c2);
+
 	if (iPairs == 1)
-		concat(c, " pair is Player ");
+		strcat(&c, &" pair is Player ");
 	else
-		concat(c, " pairs is Player ");
+		strcat(&c, &" pairs is Player ");
 	
-	sprintf(c2, "%d", iwinner);
-	concat(c, c2);
+	sprintf(&c2, "%d", iwinner);
+	strcat(&c, &c2);
 
-	objects[i] = O_New_Label(objects[i], c, 300, 300);
+	oman2.objects[oman2.Akt_Menu][i] = O_New_Label(oman2.objects[oman2.Akt_Menu][i], c, 300, 300);
 
 	i++;
-	objects[i] = O_New_Button(objects[i], "Continue", BContinue, 300, 400);
+	oman2.objects[oman2.Akt_Menu][i] = O_New_Button(oman2.objects[oman2.Akt_Menu][i], "Continue", BContinue, 300, 400);
 }
 
 char* concat(char *s1, char *s2)
@@ -282,116 +293,58 @@ char* concat(char *s1, char *s2)
 	return result;
 }
 
-int init_game(int AmPlayers, struct Card (*stack)[], int AmCards, int AmX, int AmY)
+int init_game(int AmPlayers, struct Card (*stack)[], int AmCards)
 {
+	oman2 = Load_Objects(oman2, "./resources/game_config.txt");
+
 	FILE *f;
 	f = fopen("./resources/config.txt", "r");
-
-	int i = 0;
-	// Loading Background
-	char c[100];
-	if (fscanf(f, "%s %3d %3d %3d", &c, &objects[i].x, &objects[i].y, &objects[i].type) != EOF)
-	{
-		objects[i].picture = load_picture(objects[i].picture, c);
-		if (objects[i].picture.picture == NULL)
-			return FAILED_LOADING_BACKGROUND;
-
-		objects[i].enabled = 1;
-		i++;
-	}
-
+		
 	if (fscanf(f, "%d %d %d %d", &Gamefield.x, &Gamefield.y, &Gamefield.w, &Gamefield.h) == EOF)
 		return FAILED_LOADING_GAMEFIELD;
 
-	for (int j = 0; j < 8; j++)
-	if (fscanf(f, "%d %d", &PlayerPointsPosition[j].x, &PlayerPointsPosition[j].y) == EOF)
-		return FAILED_LOADING_PlAYERPOINTSPOSITION;
-	
-	srand(time(NULL));  /* start random number generater */
+	int index = 0;
+	while (!IS_NULL(oman2.objects[oman2.Akt_Menu][index++]));
+	index--;
 
-	AktPlayer = rand() % (AmPlayers + 1);
-
-	// Paint the player-labels
-	for (int j = 0; j < AmPlayers; j++)
+	int i = 0;
+	for (i = 0; i < AmPlayers; i++)
 	{
-		objects[i].x = PlayerPointsPosition[j].x;
-		objects[i].y = PlayerPointsPosition[j].y;
-		objects[i].type = 100;
-		objects[i].enabled = 1;
-		char *c = (char *)malloc(sizeof(char));
-		sprintf(c, "%d", j + 1);
-		objects[i].picture = Create_Picture_By_Text(objects[i].picture, concat("Player ", c), j == AktPlayer ? 1 : 0);
+		Players[i].FoundPairs = 0;
+		int PPx = 0, PPy = 0;
+		if (fscanf(f, "%d %d", &PPx, &PPy) == EOF)
+			return FAILED_LOADING_PlAYERPOINTSPOSITION;
 
-		pairs[j] = 0;
-		textfield[j][0] = i++;
-
-		objects[i].x = PlayerPointsPosition[j].x;
-		objects[i].y = 30 + PlayerPointsPosition[j].y;
-		objects[i].type = 101;
-		objects[i].enabled = 1;
-		objects[i].picture = Create_Picture_By_Text(objects[i].picture, "0 pairs found", 0);
-
-		pairs[j] = 0;
-		textfield[j][1] = i++;
+		Players[i].ObPlayername = &oman2.objects[0][index++];
+		Players[i].ObPlayerPoints = &oman2.objects[0][index++];
+		*Players[i].ObPlayername = O_New_Label(*Players[i].ObPlayername, Players[i].Name, PPx, PPy);
+		*Players[i].ObPlayerPoints = O_New_Label(*Players[i].ObPlayerPoints, "0 pairs found", PPx, PPy + 30);
 	}
+
+	for (i = AmPlayers; i < 8; i++)
+		fscanf(f, "%d %d");
 
 	int X, Y;
 	if (fscanf(f, "%d %d", &X, &Y) != EOF)
 	{
-		objects[i].x = X;
-		objects[i].y = Y;
-		objects[i].type = 0;
-		objects[i].enabled = 1;
 		char *c = (char *)malloc(sizeof(char));
-
-		NuOfRePairs = AmCards / 2; 
+		NuOfRePairs = AmCards / 2;
 		sprintf(c, "%d", NuOfRePairs);
-		objects[i].picture = Create_Picture_By_Text(objects[i].picture, concat("Number of remaining pairs: ", c), 0);
 
-		PosOfReCards = i++;
+		oman2.objects[oman2.Akt_Menu][index] = O_New_Label(oman2.objects[oman2.Akt_Menu][index], concat("Number of remaining pairs: ", c), X, Y);
+		
+		PosOfReCards = index++;
 	}
 
-	if (fscanf(f, "%s", &c) == EOF)
-		return FAILED_LOADING_PIC_BUTTON_ADDRESS;
+	int SizeX = (*(*stack)[0].picture).picture->w;
+	int SizeY = (*(*stack)[0].picture).picture->h;
 
-	Pic_Button = load_picture(Pic_Button, c);
+	int AmX = Gamefield.w / SizeX;
+	int AmY = Gamefield.h / SizeY;
 
-	if (fscanf(f, "%s", &c) == EOF)
-		return FAILED_LOADING_PIC_BUTTON_CLICKED_ADDRESS;
-
-	Pic_Button_Clicked = load_picture(Pic_Button_Clicked, c);
-
-	// Load the buttons
-	for (int j = 0; j < 4; j++)
-	{
-		objects[i].type = 2;
-		objects[i].enabled = 1;
-
-		int x = 0, y = 0;
-		if (fscanf(f, "%d %d %s %d", &x, &y, &c, &objects[i].button.Type) == EOF)
-			return -1;
-
-		objects[i].button = New_Button(objects[i].button, &Pic_Button, &Pic_Button_Clicked);
-		objects[i].picture = objects[i].button.Picture;
-		objects[i].x = x;
-		objects[i].y = y;
-
-		i++;
-	}
-
-
-	// Load Objects
-
-	while (fscanf(f, "%s %3d %3d %3d", &c, &objects[i].x, &objects[i].y, &objects[i].type) != EOF)
-	{
-		objects[i].picture = load_picture(objects[i].picture, c);
-		if (objects[i].picture.picture == NULL)
-			return FAILED_LOADING_IMAGE;
-
-		objects[i].enabled = 1;
-		i++;
-	}
-
+	if (AmX * AmY < AmCards)
+		AmCards -= 2 * (int)((AmCards - AmX * AmY + 1) / 2);
+	
 	// Shuffle Cards in Stack - Knuth-Fisher-Yates shuffle **/
 	for (int j = AmCards - 1; j; j--) {
 		int k = rand() % (j + 1);  /* random variable modulo remaining cards */
@@ -404,24 +357,33 @@ int init_game(int AmPlayers, struct Card (*stack)[], int AmCards, int AmX, int A
 	// Draw Cards on gamefield
 
 	int j = 0;
-	int SizeX = (*(*stack)[0].picture).picture->w;
-	int SizeY = (*(*stack)[0].picture).picture->h;
-
-	for (int x = 0; x < AmX; x++)
-	for (int y = 0; y < AmY; y++)
+	
+	for (int x = 0; x < AmCards; x++)
 	{
 		if ((*(*stack)[j].picture).picture == NULL)
 			break;
 
-		objects[i].type = 1; // objects is card
-		objects[i].card = (*stack)[j++];
-		objects[i].picture = *objects[i].card.picture;
-		objects[i].card.picture = &objects[i].picture;
-		objects[i].enabled = 1;
-		objects[i].x = Gamefield.x + Gamefield.w / AmX * x;
-		objects[i].y = Gamefield.y + Gamefield.h / AmY * y;
-		i++;
+		oman2.objects[oman2.Akt_Menu][index].type = TCard; // oman2.objects[oman2.Akt_Menu] is card
+		oman2.objects[oman2.Akt_Menu][index].card = (*stack)[j++];
+		oman2.objects[oman2.Akt_Menu][index].picture = *oman2.objects[oman2.Akt_Menu][index].card.picture;
+		oman2.objects[oman2.Akt_Menu][index].card.picture = &oman2.objects[oman2.Akt_Menu][index].picture;
+		oman2.objects[oman2.Akt_Menu][index].enabled = 1;
+		oman2.objects[oman2.Akt_Menu][index].x = Gamefield.x + Gamefield.w / AmX * (x % AmX);
+		oman2.objects[oman2.Akt_Menu][index].y = Gamefield.y + Gamefield.h / AmY * (int)(x / AmX);
+		index++;
 	}
 
+
+	UpdateRemainingCards(AmCards);
+
 	return 0;
+}
+
+int UpdateRemainingCards(int AmCards)
+{
+	char *c = (char *)malloc(sizeof(char));
+	NuOfRePairs = AmCards / 2;
+	sprintf(c, "%d", NuOfRePairs);
+
+	oman2.objects[oman2.Akt_Menu][PosOfReCards].picture = Create_Picture_By_Text(oman2.objects[oman2.Akt_Menu][PosOfReCards].picture, concat("Number of remaining pairs: ", c), 0);
 }

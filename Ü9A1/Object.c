@@ -78,11 +78,11 @@ struct Object O_New_Button(struct Object O, char Text[], int Button_Type, int X,
 
 struct Object O_New_Label(struct Object O, char Text[], int X, int Y)
 {
-	strcpy(O.label.Text, Text);
-	O.enabled = 1;
-	O.picture = Create_Picture_By_Text(O.picture, Text, 0);
-	O.type = TLabel;
 	O.x = X;
 	O.y = Y;
+	strcpy(O.label.Text, Text);
+	O.enabled = 1;
+	O.picture = Create_Picture_By_Text(O.picture, O.label.Text, 0);
+	O.type = TLabel;
 	return O;
 }

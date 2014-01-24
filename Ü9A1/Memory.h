@@ -17,13 +17,13 @@
 #define	FAILED_LOADING_GAME							-12
 #define FAILED_LOADING_SAVEGAME						-14
 
-#define ARRAY_LENGTH	1000
+//#define ARRAY_LENGTH	200
 
 /** further definitions **/
 #define EXTENDED_VERSION
 
 SDL_Surface *_screen;
 
-int start_game(int amplayers, struct Card (*stack)[], int AmCards, int SizeX, int SizeY, struct Picture *BG, int Loading_Game);
+int start_game(int amplayers, struct Card(*stack)[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[]);
 
 #endif

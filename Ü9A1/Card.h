@@ -5,7 +5,7 @@
 
 #pragma warning( disable : 4996 )
 #define FAILED_LOADING_IMAGE			-3
-#define ARRAY_LENGTH	1000
+#define ARRAY_LENGTH					150
 
 struct Card
 {
@@ -17,5 +17,6 @@ struct Card
 
 int init_cards(struct Card (*cards)[], char FileName[]); // returns the amount of cards
 int Save_Card(FILE *f, struct Card c);
+int freadString(FILE *f, char(*Output)[], char seperator, int MaxLength); // Returns 0 for ok, -1 for string is too long
 
 #endif

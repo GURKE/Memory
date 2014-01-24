@@ -11,6 +11,19 @@
 #pragma warning( disable : 4996 )
 
 
+int freadString(FILE *f, char(*Output)[], char seperator); // Returns 0 for ok, -1 for string is too long
+
+int freadString(FILE *f, char(*Output)[], char seperator, int MaxLength) // Returns 0 for ok, -1 for string is too long
+{
+	int i = 0;
+	while (((*Output)[i] = fgetc(f)) != seperator && (*Output)[i] != '\0')
+	{
+		if (i == MaxLength - 1) return -1; else i++;
+	}
+	(*Output)[i] = '\0';
+	return 0;
+}
+
 int init_cards(struct Card (*cards)[], char FileName[])
 {	
 	FILE *f;
@@ -26,9 +39,15 @@ int init_cards(struct Card (*cards)[], char FileName[])
 
 	int j = 0;
 	char c[100]; //string für den Dateipfad
-	while (fscanf(f, "%s %d %d", &c, &(*cards)[j].difficulty, &(*cards)[j].type) != EOF) //End of File =  EOF
+	while (1)
 	{
+		if (freadString(f, &c, '#', 100))
+			break;
+		if (fscanf(f, "%d#%d#\n", &(*cards)[j].difficulty, &(*cards)[j].type) == EOF) //End of File =  EOF
+			break;
+
 		*(*cards)[j].picture = load_picture(*(*cards)[j].picture, c);
+		
 
 		if ((*cards)[j].picture->picture == NULL)
 			return FAILED_LOADING_IMAGE;

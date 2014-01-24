@@ -1,1 +1,4 @@
-./resources/card_backgrounds/cardba1.bmp
+./resources/card_backgrounds/Background1.bmp
+./resources/card_backgrounds/Background2.bmp
+./resources/card_backgrounds/Background3.bmp
+./resources/card_backgrounds/Background4.bmp

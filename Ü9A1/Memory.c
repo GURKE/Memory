@@ -12,6 +12,10 @@
 #include "Objectmanager.h"
 #include "Highscore.h"
 #include "Object.h"
+<<<<<<< HEAD
+=======
+#include "Player.h"
+>>>>>>> Optimized Menu
 
 #pragma warning( disable : 4996 )
 #pragma comment(lib, "winmm.lib") // For the sound
@@ -23,6 +27,8 @@
 #endif
 
 struct Picture card_background[ARRAY_LENGTH];
+int Akt_Background = 0; // The selected Background
+
 struct Card cards[ARRAY_LENGTH];
 
 struct Objectmanager oman;
@@ -32,6 +38,9 @@ int init_menu();
 int Paint_Highscore();
 
 
+int Key_Clicked(SDL_Event event);
+
+int Speaker = -1;
 int SoundOn = 1;
 
 int main(int argc, char *argv[])
@@ -75,8 +84,11 @@ int main(int argc, char *argv[])
 	init_cards(&cards[0], "./resources/cards/cards.txt");
 	init_menu();
 
+<<<<<<< HEAD
 	SDL_Event event;
 
+=======
+>>>>>>> Optimized Menu
 	while (SDL_WaitEvent(&event))
 	{
 		if (event.type == SDL_QUIT)
@@ -92,125 +104,190 @@ int main(int argc, char *argv[])
 			else
 			{
 				int Types[] = { 2 };
-				actobject = dist2object(event.button.x, event.button.y, Types, 1);
+				actobject = dist2object(oman.objects[oman.Akt_Menu], event.button.x, event.button.y, Types, 1);
 			}
 
 			if (actobject > -1)
 			{
 				if (oman.objects[oman.Akt_Menu][actobject].button.Type == BStart) // Start game
 				{
-					int result = start_game(2, cards, 4, 7, 7, &card_background[0], 0);
+					struct Player Players[8];
+
+					strcpy(Players[0].Name, "Carl");
+					strcpy(Players[1].Name, "Peter");
+
+					int result = start_game(2, cards, 4, &card_background[Akt_Background], 0, Players);
 					if (result)
 						return result;
 				}
 				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BHighscore)
 				{
 					Paint_Highscore();
-					Chane_Menu(HIGH_SCORE, &oman.Akt_Button);
+					Change_Menu(&oman, _screen, HIGH_SCORE, &oman.Akt_Button);
 				}
 				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BMainMenu)
 				{
-					Chane_Menu(MAIN_MENU, &oman.Akt_Button);
+					Change_Menu(&oman, _screen, MAIN_MENU, &oman.Akt_Button);
 				}
 				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BConfigurations)
 				{
-					Chane_Menu(CONFIGURATIONS, &oman.Akt_Button);
+					init_options();
+					Change_Menu(&oman, _screen, CONFIGURATIONS, &oman.Akt_Button);
 				}
 				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BSoundOn)
 				{
-					PlaySound(L"./resources/music/Bioweapon - Heretic.wav", NULL, SND_LOOP | SND_ASYNC);
+					SwitchSound(1);
 				}
 				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BSoundOff)
 				{
-					PlaySound(NULL, NULL, SND_LOOP | SND_ASYNC);
+					SwitchSound(0);
 				}
 				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BExit)
 				{
 					return 0;
 				}
+<<<<<<< HEAD
 				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BArrow_Left_1)
                 {
                     //Befehl
                 }
+=======
+				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BSwitchBackground)
+				{
+					Akt_Background = oman.objects[oman.Akt_Menu][actobject].button.Value;
+				}
+				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BSwitchSound)
+				{
+					SwitchSound(-1);
+				}
+>>>>>>> Optimized Menu
 			}
 		}
 		else if (event.type == SDL_MOUSEMOTION)
 		{
 			// Check for the button
 			int Types[] = { 2 };
-			int newbutton = dist2object(oman.Akt_Menu, event.button.x, event.button.y, Types, 1);
-			if (newbutton > -1)
+			int newbutton = dist2object(oman.objects[oman.Akt_Menu], event.button.x, event.button.y, Types, 1);
+			if (oman.objects[oman.Akt_Menu][newbutton].button.Value > -1) // -1 -> dont react on mouse
 			{
-				if (newbutton != oman.Akt_Button)
+				if (newbutton > -1)
 				{
-					oman.objects[oman.Akt_Menu][newbutton].button.Clicked = 1;
-					oman.Akt_Button = newbutton;
+					if (newbutton != oman.Akt_Button)
+					{
+						if (oman.Akt_Button > -1)
+							oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 0;
+
+						if (oman.Akt_Button > -1)
+							oman.objects[oman.Akt_Menu][newbutton].button.Clicked = 0;
+
+						oman.objects[oman.Akt_Menu][newbutton].button.Clicked = 1;
+						oman.Akt_Button = newbutton;
+						oman.Akt_Button_Activated_By_Mouse = 1;
+					}
 				}
+				else if (oman.Akt_Button > -1 && oman.Akt_Button_Activated_By_Mouse) // Reset clicked button, after mouse left it
+				{
+					oman.objects[oman.Akt_Menu][oman.Akt_Button].button.Clicked = 0;
+					oman.Akt_Button = -1;
+				}
+				paint_screen(_screen, oman.objects[oman.Akt_Menu]);
 			}
-			else if (oman.Akt_Button > -1) // Reset clicked button, after mouse left it
-			{
-				oman.objects[oman.Akt_Menu][oman.Akt_Button].button.Clicked = 0;
-				oman.Akt_Button = -1;
-			}
-			paint_screen(_screen, oman.Akt_Menu);
 		}
 		else if (event.type == SDL_KEYDOWN)
 		{
-			if (event.key.keysym.sym == SDLK_DOWN)
-			{
-				if (oman.Akt_Button > -1)
-					oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 0;
-
-				oman.Akt_Button++;
-				if (oman.Akt_Button >= oman.NumberOfButtons[oman.Akt_Menu])
-					oman.Akt_Button = 0;
-
-				oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 1;
-
-				paint_screen(_screen, oman.Akt_Menu);
-			}
-			else if (event.key.keysym.sym == SDLK_UP)
-			{
-				if (oman.Akt_Button > -1)
-					oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 0;
-
-				oman.Akt_Button--;
-				if (oman.Akt_Button < 0)
-					oman.Akt_Button = oman.NumberOfButtons[oman.Akt_Menu] - 1;
-
-				oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 1;
-
-				paint_screen(_screen, oman.Akt_Menu);
-			}
+			Key_Clicked(event);
 		}
 	}
-
 
 	SDL_Quit();
 
 	return 0;
 }
 
-int Chane_Menu(int Menu, int *Akt_Button)
+int init_options()
 {
-	oman.objects[oman.Akt_Menu][*Akt_Button].button.Clicked = 0;
-	*Akt_Button = -1;
+	int i = 0;
+	while (!IS_NULL(oman.objects[CONFIGURATIONS][i]))
+	{
+		if (oman.objects[CONFIGURATIONS][i].button.Type == BSwitchSound)
+		{
+			Speaker = i;
+			break;
+		}
+		i++;
+	}
+}
 
+int SwitchSound(int Switch)
+{
+		if ((SoundOn && Switch == -1 ) || Switch == 0)
+	{
+		PlaySound(NULL, NULL, SND_LOOP | SND_ASYNC);
+		SoundOn = 0;
+		if (Speaker > -1)
+			oman.objects[oman.Akt_Menu][Speaker].button.Clicked = 1;
+	}
+	else
+	{
+		PlaySound(L"./resources/music/Bioweapon - Heretic.wav", NULL, SND_LOOP | SND_ASYNC);
+		SoundOn = 1;
+		if (Speaker > -1)
+			oman.objects[oman.Akt_Menu][Speaker].button.Clicked = 0;
+	}
+	paint_screen(_screen, oman.objects[oman.Akt_Menu]);
+}
+
+int Key_Clicked(SDL_Event event)
+{
+	if (event.key.keysym.sym == SDLK_DOWN)
+	{
+		if (oman.Akt_Button > -1)
+			oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 0;
+
+		oman.Akt_Button++;
+		if (oman.Akt_Button >= oman.NumberOfButtons[oman.Akt_Menu])
+			oman.Akt_Button = 0;
+
+		oman.Akt_Button_Activated_By_Mouse = 0;
+
+		oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 1;
+
+		paint_screen(_screen, oman.objects[oman.Akt_Menu]);
+	}
+	else if (event.key.keysym.sym == SDLK_UP)
+	{
+		if (oman.Akt_Button > -1)
+			oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 0;
+
+		oman.Akt_Button--;
+		if (oman.Akt_Button < 0)
+			oman.Akt_Button = oman.NumberOfButtons[oman.Akt_Menu] - 1;
+
+<<<<<<< HEAD
 	oman.Akt_Menu = Menu;
 
 	paint_screen(_screen, oman.Akt_Menu);
 	return -1;
+=======
+		oman.Akt_Button_Activated_By_Mouse = 0;
+
+		oman.objects[oman.Akt_Menu][oman.Buttons[oman.Akt_Menu][oman.Akt_Button]].button.Clicked = 1;
+
+		paint_screen(_screen, oman.objects[oman.Akt_Menu]);
+	}
+>>>>>>> Optimized Menu
 }
 
 int Paint_Highscore()
 {
 	int i = 0;
-	while (!IS_NULL(oman.objects[oman.Akt_Menu][i]))
+	while (!IS_NULL(oman.objects[HIGH_SCORE][i]))
 	{
 		if (oman.objects[HIGH_SCORE][i].type == THighscoreitem)
 			oman.objects[HIGH_SCORE][i].enabled = 0;
 		i++;
 	}
+
 	struct Object *o = GetHighscoreItems();
 	for (int j = 0; j < HS_LENGTH * 2; j++)
 		oman.objects[HIGH_SCORE][i++] = *(o++);
@@ -227,8 +304,14 @@ int init_menu()
 
 	// Load the different Menues
 	oman = Load_Objects(oman, "./resources/menu_config.txt");
+<<<<<<< HEAD
+=======
+	
+	oman.Akt_Button_Activated_By_Mouse = 0;
+	oman.Akt_Button = -1;
+>>>>>>> Optimized Menu
 
-	paint_screen(_screen, oman.Akt_Menu);
+	paint_screen(_screen, oman.objects[oman.Akt_Menu]);
 }
 
 int init_card_background()

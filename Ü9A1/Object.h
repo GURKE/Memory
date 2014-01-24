@@ -27,7 +27,7 @@ struct Picture Card_Background;
 struct Object
 {
 	int x, y;
-	int type; // 0 = hard/background, 1 = card, 2 = button
+	int type;
 	int enabled;
 
 	struct Picture picture;

@@ -1,0 +1,11 @@
+0
+	B 3	
+		80#959#12#Close#
+		250#959#1#Save#
+		420#959#2#Load#
+	O 4
+		./resources/Game_Background.bmp#0#0#0#0
+		./resources/application_exit.bmp#20#949#2#12#0#./resources/application_exit.bmp#	
+		./resources/gnome_media_floppy.bmp#190#949#2#1#0#./resources/gnome_media_floppy.bmp#	
+		./resources/load.bmp#360#954#2#2#0#./resources/load.bmp#
+	L 0

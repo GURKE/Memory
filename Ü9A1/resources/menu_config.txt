@@ -1,45 +1,47 @@
 0
 	B 4
-		540 380 Start 2
-		540 450 Highscore 3
-		540 520 Configurations 6
-		540 590 Close 0
-	O 1
-		./resources/Menu_Background.bmp 0 0 0
+		540#380#2#Start#
+		540#450#3#Highscore#
+		540#520#6#Configurations#
+		540#590#0#Close#
+	O 5
+		./resources/Menu_Background.bmp#0#0#0#0#0
+		./resources/game_pad.bmp#480#370#2#2#0#./resources/game_pad.bmp#
+		./resources/hot_table.bmp#480#440#2#3#0#./resources/hot_table.bmp#
+		./resources/advancedsettings.bmp#480#510#2#6#0#./resources/advancedsettings.bmp#
+		./resources/application_exit.bmp#480#580#2#0#0#./resources/application_exit.bmp#
 	L 0
 1
 	B 1
-		540 800 Menu 5
+		540#800#5#Menu#
 	O 1
-		./resources/Highscore_Background.bmp 0 0 0
+		./resources/Highscore_Background.bmp#0#0#0#0#0
 	L 14
-		500 50 Highscore
-		264	132 Rank
-		364 132	Name
-		845 132 Moves
-		264 181 1
-		264 230 2
-		264 279 3
-		264 328 4
-		264 377 5
-		264 426 6
-		264 475 7
-		264 524 8
-		264 573 9
-		264 622 10
+		500#50#Highscore#
+		264#132#Rank#
+		364#132#Name#
+		845#132#Moves#
+		264#181#1#
+		264#230#2#
+		264#279#3#
+		264#328#4#
+		264#377#5#
+		264#426#6#
+		264#475#7#
+		264#524#8#
+		264#573#9#
+		264#622#10#
 2
 	B 3
-		540 520 On 7
-		580 520 Off 8
-		540 800 Menu 5
-	O 4
-		./resources/Template_Vorderseite_1.bmp 210 640 0
-		./resources/Template_Vorderseite_2.bmp 430 640 0
-		./resources/Template_Vorderseite_3.bmp 650 640 0
-		./resources/Template_Vorderseite_4.bmp 870 640 0
+		540#520#7#On#
+		580#520#8#Off#
+		540#800#5#Menu#
+	O 6
+		./resources/Options_Background.bmp#0#0#0#0#0#	
+		./resources/Sound.bmp#490#510#2#11#-1#./resources/Soundless.bmp#		./resources/card_backgrounds/Background1.bmp#210#640#2#10#0#./resources/Card_Selected.bmp#	./resources/card_backgrounds/Background2.bmp#430#640#2#10#1#./resources/Card_Selected.bmp#	./resources/card_backgrounds/Background3.bmp#650#640#2#10#2#./resources/Card_Selected.bmp#	./resources/card_backgrounds/Background4.bmp#870#640#2#10#3#./resources/Card_Selected.bmp#
 	L 2
-		540 600 Background
-		540 450 Sound
+		540#600#Background#
+		540#450#Sound#
 3
 	B 0
 	O 0

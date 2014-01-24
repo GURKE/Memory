@@ -51,6 +51,9 @@
     <ClInclude Include="Objectmanager.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -84,6 +87,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Objectmanager.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
