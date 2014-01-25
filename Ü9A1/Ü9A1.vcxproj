@@ -63,7 +63,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SDL.lib;SDLmain.lib;SDL_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <StackReserveSize>10000000</StackReserveSize>
+      <StackReserveSize>20000000</StackReserveSize>
     </Link>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -91,8 +91,10 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Button.h" />
     <ClInclude Include="Card.h" />
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="Card%28old%29.h" />
+    <ClInclude Include="Generel_Proc.h" />
     <ClInclude Include="Highscore.h" />
     <ClInclude Include="Highscoreitem.h" />
     <ClInclude Include="Label.h" />
@@ -105,8 +107,10 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Button.c" />
     <ClCompile Include="Card.c" />
+    <ClCompile Include="Button.c" />
+    <ClCompile Include="Card%28old%29.c" />
+    <ClCompile Include="Generel_Proc.c" />
     <ClCompile Include="Highscore.c" />
     <ClCompile Include="Game.c" />
     <ClCompile Include="Highscoreitem.c" />

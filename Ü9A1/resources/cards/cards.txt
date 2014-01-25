@@ -1,5 +1,5 @@
-./resources/cards/Thema 1/Negation_Def_1_1.bmp#1#1#
-./resources/cards/Thema 1/Negation_1_1.bmp#1#1#
+./resources/cards/Thema 1/Negation_Def_1_1.bmp#1#0#
+./resources/cards/Thema 1/Negation_1_1.bmp#1#0#
 ./resources/cards/Thema 1/Normalenvektor_Ebene_Def_2_1 (2).bmp#1#1#
 ./resources/cards/Thema 1/Normalenvektor_Ebene_Def_2_1.bmp#1#1#
 ./resources/cards/Thema 1/Tautologie_Def_1_1.bmp#1#2#

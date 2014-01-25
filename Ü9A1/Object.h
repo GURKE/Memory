@@ -15,14 +15,17 @@
 Uint32 _bg_color;
 struct Picture Card_Background;
 
-#define THard 0
-#define TCard 1
-#define TButton 2
-#define TLabel 3
-#define THighscoreitem 4
-#define TTextbox 5
+#define THard						0
+#define TCard						1
+#define TButton						2
+#define TLabel						3
+#define THighscoreitem				4
+#define TTextbox					5
+#define TButtonWithFrame			6
+#define TCardFrameChosen			7
+#define TSiteSelected				8
 
-#define FAILED_LOADING_BACKGROUND					-11
+#define FAILED_LOADING_BACKGROUND	-11
 
 struct Object
 {
@@ -39,7 +42,8 @@ struct Object
 int IS_NULL(struct Object o);
 SDL_Rect *Create_Rect_BO(struct Object *o, int move);
 int Save_Objects(struct Object objects[], FILE *f);
-struct Object O_New_Button(struct Object O, char Text[], int Button_Type, int X, int Y);
+struct Object O_New_Button(struct Object O, char Text[], int Button_Type, int Value, int X, int Y);
 struct Object O_New_Label(struct Object O, char Text[], int X, int Y);
+struct Object O_New_Object(struct Object O, int X, int Y, int Type, char Filename1[], char Filename2[], int ButtonType, int ButtonValue);
 
 #endif

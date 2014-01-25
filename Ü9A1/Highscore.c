@@ -8,6 +8,9 @@
 #include "Highscoreitem.h"
 #include "Object.h"
 #include "Highscore.h"
+#include "Player.h"
+#include "Generel_Proc.h"
+
 #pragma warning( disable : 4996 )
 
 /*Laufvariable z für Züge nötig, die bei jedem Zug um eins erhöht wird, in der Highscoreliste wird dabei das
@@ -18,17 +21,25 @@ int moves;												// erreichte Züge des Benutzers
 char user[NAME_LENGTH];									// Name des Benutzers*/
 
 
-struct Highscoreitem Highscoreitems[HS_LENGTH];
+struct Highscoreitem Highscoreitems[8][HS_LENGTH];
 
-char* gethighscore();
-void writehighscore(char name[], int moves);
-int testhighscore(int moves);
-struct Object *GetHighscoreItems();
+char* Load_Highscore(int AmPlayers);
+int testhighscore(int moves, int AmPlayers);
+struct Object *GetHighscoreItems(int AmPlayers); 
+void add_Highscoreitems(struct Player Players[8], int AmPlayers, int AmCards);                    // void: nichts zurückgeben, wert soll eingetragen werden
+print_Highscore(int AmPlayers);
 
-char* gethighscore()
+char* Load_Highscore(int AmPlayers)
 {
-	FILE* liste = fopen("./resources/highscore.txt", "r");                   // Öffnen der Textdatei
-	char c[1];                                                 // Zeichen
+	char c2[ARRAY_LENGTH];
+	c2[0] = '\0';
+	char c[2];
+	sprintf(&c, "%d", AmPlayers);
+	strcat(&c2, &"./resources/Highscores/highscore_");
+	strcat(&c2, &c);
+	strcat(&c2, &".txt");
+	FILE* liste = fopen(c2, "r");					// Öffnen der Textdatei
+	
 	int underscore = 0;
 	int ranking = 0;
 
@@ -43,13 +54,13 @@ char* gethighscore()
 			switch (underscore)
 			{
 			case 0:
-				Highscoreitems[ranking].ranking = ranking;
+				Highscoreitems[AmPlayers - 1][ranking].ranking = ranking;
 				break;
 			case 1:
-				strcpy(Highscoreitems[ranking].name, Zwischenspeicher);				
+				strcpy(Highscoreitems[AmPlayers - 1][ranking].name, Zwischenspeicher);
 				break;
 			case 2:
-				Highscoreitems[ranking].moves = atoi(Zwischenspeicher);
+				Highscoreitems[AmPlayers - 1][ranking].moves = atoi(Zwischenspeicher);
 				break;
 			}
 
@@ -60,67 +71,84 @@ char* gethighscore()
 		{
 			underscore = 0;
 			ranking++;
+			Zwischenspeicher[0] = '\0';
 		}
 		else
 		{													// Zeichen einlesen
 			strncat(Zwischenspeicher, c, 1);
 		}
 
-	} while (c != EOF && ranking < 10);
+	} while (c[0] != EOF && ranking < 10);
 
-	return Highscoreitems;
+	return Highscoreitems[AmPlayers - 1];
 }
 
-int testhighscore(int moves)                                // moves Anzahl der Züge
+int testhighscore(int moves, int AmPlayers)                                // moves Anzahl der Züge
 {
-    int ranking = 0;
-	while (Highscoreitems[ranking].moves < moves) ranking++;             // string wird in integer umgewandelt
+	int ranking = 0;
+	if (AmPlayers > 1)
+		while (Highscoreitems[AmPlayers - 1][ranking].moves > moves) ranking++; // string wird in integer umgewandelt
+	else
+	while (Highscoreitems[AmPlayers - 1][ranking].moves < moves && Highscoreitems[AmPlayers - 1][ranking].name[0] != '\0') ranking++; // string wird in integer umgewandelt
+
 	if (ranking < 10)
-		return ranking - 1;
+		return ranking;
 	else
 		return -1;
 }
 
-
-void writehighscore(char name[], int moves)                    // void: nichts zurückgeben, wert soll eingetragen werden
+void add_Highscoreitems(struct Player Players[8], int AmPlayers, int AmCards)							// void: nichts zurückgeben, wert soll eingetragen werden
 {
-	int ranking = testhighscore(moves);						// ranking ist zeile aus testhighscore 
-	if (ranking > -1)										// wenn 0 wird nicht ausgeführt
+	int i = 0;
+	for (; i < AmPlayers; i++)
 	{
-		int i = 9;
-		while (i > ranking)
+		if (AmPlayers > 1)
+			Players[i].FoundPairs = ((2. / 5) * (Players[i].FoundPairs - 5) * (Players[i].FoundPairs - 5) * (Players[i].FoundPairs - 5) + 50) * AmCards / 20;					// (2/5*(Pairs-5)^3+50)*Cards/MaxCards
+		else
+			Players[i].FoundPairs = (100 - ((2. / 5) * (Players[i].FoundPairs - 5) * (Players[i].FoundPairs - 5) * (Players[i].FoundPairs - 5) + 50)) * AmCards / 20;					// (2/5*(Pairs-5)^3+50)*Cards/MaxCards
+
+		int ranking = testhighscore(Players[i].FoundPairs, AmPlayers);						// ranking ist zeile aus testhighscore 
+		if (ranking > -1)																	// wenn 0 wird nicht ausgeführt
 		{
-			Highscoreitems[i] = Highscoreitems[i-- - 1];
+			int j = 9;
+			while (j > ranking)
+			{
+				Highscoreitems[AmPlayers - 1][j] = Highscoreitems[AmPlayers - 1][j-- - 1];
+			}
+			strcpy(Highscoreitems[AmPlayers - 1][ranking].name, Players[i].Name);
+			Highscoreitems[AmPlayers - 1][ranking].moves = Players[i].FoundPairs;
+			Highscoreitems[AmPlayers - 1][ranking].ranking = ranking;
 		}
-		strcpy(Highscoreitems[ranking].name, name);
-		Highscoreitems[ranking].moves = moves;
-		Highscoreitems[ranking].ranking = ranking;
 	}
 
-	print_Highscore();
+	print_Highscore(AmPlayers);
 }
 
-print_Highscore()
+print_Highscore(int AmPlayers)
 {
-	FILE *f = fopen("./resources/highscore.txt", "w");
+	char c[2];
+	sprintf(&c, "%d", AmPlayers);
+	FILE *f = fopen(concat(concat("./resources/Highscores/highscore_", c), ".txt"), "w");					// Öffnen der Textdatei
+
 	for (int i = 0; i < HS_LENGTH; i++)
 	{
-		fprintf(f, "%d_%s_%d_\n", Highscoreitems[i].ranking, Highscoreitems[i].name, Highscoreitems[i].moves);
+		fprintf(f, "%d_%s_%d_\n", Highscoreitems[AmPlayers - 1][i].ranking, Highscoreitems[AmPlayers - 1][i].name, Highscoreitems[AmPlayers - 1][i].moves);
 	}
+	fclose(f);
 }
 
-struct Object *GetHighscoreItems()
+struct Object *GetHighscoreItems(int AmPlayers)
 {
-	gethighscore();
+	Load_Highscore(AmPlayers);
 
 	struct Object *o = (struct Object*)malloc(2 * HS_LENGTH * sizeof(struct Object));
 	for (int i = 0; i < HS_LENGTH; i++)
 	{
-		*o = O_New_Label(*o, Highscoreitems[i].name, 364, 181 + 49 * i);
+		*o = O_New_Label(*o, Highscoreitems[AmPlayers - 1][i].name, 364, 181 + 49 * i);
 		o->type = THighscoreitem;
 		o++;
-		char c[3];
-		sprintf(c, "%d", Highscoreitems[i].moves);
+		char c[4];
+		sprintf(c, "%d", Highscoreitems[AmPlayers - 1][i].moves);
 
 		*o = O_New_Label(*o, c, 845, 181 + 49 * i);
 		o->type = THighscoreitem;

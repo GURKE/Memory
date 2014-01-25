@@ -17,6 +17,9 @@
 #define	FAILED_LOADING_GAME							-12
 #define FAILED_LOADING_SAVEGAME						-14
 
+#define GECLOSED									-1
+#define GEENDED										-2
+
 //#define ARRAY_LENGTH	200
 
 /** further definitions **/
@@ -24,6 +27,7 @@
 
 SDL_Surface *_screen;
 
+struct Player *GetWinner();
 int start_game(int amplayers, struct Card(*stack)[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[]);
 
 #endif

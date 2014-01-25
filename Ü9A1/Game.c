@@ -32,12 +32,12 @@ SDL_Rect Gamefield;
 int init_game(int AmPlayers, struct Card (*stack)[], int AmCards);
 int start_game(int amplayers, struct Card(*stack)[], int AmCards, int SizeX, int SizeY, struct Picture *BG, int Loading_Game, struct Player _players[]);
 int paint_screen();
-char* concat(char *s1, char *s2);
 int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int amCards, SDL_Event event, int amplayers);
 int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayers);
 int Save_Game(int amPlayers, struct Card *cards[]);
 int Load_Game();
 int UpdateRemainingCards(int AmCards);
+struct Player *SortWinner(int AmPlayer);
 
 //struct Object objects[ARRAY_LENGTH];
 
@@ -56,6 +56,8 @@ struct Picture Pic_Button_Clicked;
 
 struct Objectmanager oman2;
 struct Player Players[8];
+
+struct Player *GetWinner();
 
 int start_game(int amplayers, struct Card (*stack)[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[])
 {
@@ -91,8 +93,8 @@ int start_game(int amplayers, struct Card (*stack)[], int AmCards, struct Pictur
 		if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
 		{
 			int result = Mouse_Clicked(mod, card1, card2, &stack, AmCards, event, amplayers);
-			if (result == -1)
-				break;
+			if (result == GECLOSED || result == GEENDED)
+				return result;
 
 		}
 		else if (event.type == SDL_MOUSEMOTION)
@@ -162,8 +164,6 @@ int Load_Game()
 
 	Card_Background = load_picture(Card_Background, FileName);
 
-
-	
 	start_game(amPlayers, cards, amCards, GameSizeX, GameSizeY, &Card_Background, 1, Players);
 
 	return 0;
@@ -178,9 +178,12 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int am
 	{
 		switch (oman2.objects[oman2.Akt_Menu][actcard].button.Type) // Beenden
 		{
-		case 12: Change_Menu(&oman2, _screen, EXIT, &oman2.Akt_Button); break;
-		case 1: Save_Game(amplayers, amCards, cards); break;
-		case 2: Load_Game(); break;
+		case BGameExit: Change_Menu(&oman2, _screen, MEXIT, &oman2.Akt_Button); return 0;
+		case BBack: Change_Menu(&oman2, _screen, MGAME, &oman2.Akt_Button); return 0;
+		case BGameExitConfirmation: return GECLOSED;
+		case BContinue: return GEENDED;
+		case BSave: Save_Game(amplayers, amCards, cards); break;
+		case BLoad: Load_Game(); break;
 		default:	break;
 		}
 	}
@@ -202,12 +205,16 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int am
 			break;
 
 		case 2: // Remove them or move them back
+			if (amplayers == 1)
+				Players[AktPlayer].FoundPairs++;
+
 			if (oman2.objects[oman2.Akt_Menu][*card1].card.type == oman2.objects[oman2.Akt_Menu][*card2].card.type)
 			{ // Pair found
 				oman2.objects[oman2.Akt_Menu][*card1].enabled = 0;
 				oman2.objects[oman2.Akt_Menu][*card2].enabled = 0;
 
-				Players[AktPlayer].FoundPairs++;
+				if (amplayers > 1)	
+					Players[AktPlayer].FoundPairs++;
 
 				char *c = (char *)malloc(sizeof(char));
 				sprintf(c, "%d", Players[AktPlayer].FoundPairs);
@@ -244,57 +251,85 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int am
 		}
 		paint_screen(_screen, oman2.objects[oman2.Akt_Menu]);
 	}
+	return 0;
 }
 
 int GameEnd(int amPlayers)
 {
-	int iwinner;
-	int iPairs = 0;
-	for (int i = 0; i < amPlayers; i++)
-	if (Players[i].FoundPairs > iPairs)
+	struct Player *Winner = SortWinner(amPlayers);
+
+	Change_Menu(&oman2, _screen, MGAME_HS, &oman2.Akt_Button);
+
+	char Highscoreitemfilename[ARRAY_LENGTH];
+
+	// Searches the last item and searches the filename for the Highscoreitem
+	int index = 0;
+	int ItemFound = 0;
+	while (!IS_NULL(oman2.objects[oman2.Akt_Menu][index]))
 	{
-		iwinner = i;
-		iPairs = Players[i].FoundPairs;
+		if (oman2.objects[oman2.Akt_Menu][index].type == THighscoreitem) 
+		{
+			if (ItemFound)
+				oman2.objects[oman2.Akt_Menu][index].enabled = 0; // Disable old Highscoreitems
+			else
+			{
+				strcpy(Highscoreitemfilename, oman2.objects[oman2.Akt_Menu][index].picture.filename);
+				ItemFound = 1;
+			}
+		}
+		index++;
 	}
+	index--;
 
-	int i = 0;
-	while (!IS_NULL(oman2.objects[oman2.Akt_Menu][i++]));
-	i--;
+	int j = 0;
+	int rank = 1;
+	// List the winner
+	for (j = 0; j < amPlayers; j++)
+	{
+		if (Highscoreitemfilename[0] != '\0') 
+		{
+			oman2.objects[oman2.Akt_Menu][index] = O_New_Object(oman2.objects[oman2.Akt_Menu][index], 248, 166 + j * 49, THighscoreitem, Highscoreitemfilename, "", 0, 0);
+			index++;
+		}
 
-	char c[100];
-	c[0] = '\0';
-	strcat(&c, &"The Winner with ");
+		if (j == 0 || Winner[j].FoundPairs != Winner[j - 1].FoundPairs) // No need for an new rank number
+		{
+			char c[2];
+			sprintf(&c, "%d", rank);
 
-	char c2[100];
-	sprintf(&c2, "%d", iPairs);
-	strcat(&c, &c2);
+			oman2.objects[oman2.Akt_Menu][index] = O_New_Label(oman2.objects[oman2.Akt_Menu][index], c, 264, 181 + j * 49);
+			oman2.objects[oman2.Akt_Menu][index].type = THighscoreitem;
+			index++;
+			rank++;
+		}
 
-	if (iPairs == 1)
-		strcat(&c, &" pair is Player ");
-	else
-		strcat(&c, &" pairs is Player ");
-	
-	sprintf(&c2, "%d", iwinner);
-	strcat(&c, &c2);
+		oman2.objects[oman2.Akt_Menu][index] = O_New_Label(oman2.objects[oman2.Akt_Menu][index], Winner[j].Name, 364, 181 + j * 49);
+		oman2.objects[oman2.Akt_Menu][index].type = THighscoreitem; 
+		index++;
 
-	oman2.objects[oman2.Akt_Menu][i] = O_New_Label(oman2.objects[oman2.Akt_Menu][i], c, 300, 300);
-
-	i++;
-	oman2.objects[oman2.Akt_Menu][i] = O_New_Button(oman2.objects[oman2.Akt_Menu][i], "Continue", BContinue, 300, 400);
+		char c[3];
+		sprintf(&c, "%d", Winner[j].FoundPairs);
+		oman2.objects[oman2.Akt_Menu][index] = O_New_Label(oman2.objects[oman2.Akt_Menu][index], c, 845, 181 + j * 49);
+		oman2.objects[oman2.Akt_Menu][index].type = THighscoreitem; 
+		index++;
+	}
 }
 
-char* concat(char *s1, char *s2)
+struct Player *GetWinner()
 {
-	char *result = (char *)malloc(strlen(s1) + strlen(s2) + 1);//+1 for the zero-terminator
-	//in real code you would check for errors in malloc here
-	strcpy(result, s1);
-	strcat(result, s2);
-
-	return result;
+	return Players;
 }
 
 int init_game(int AmPlayers, struct Card (*stack)[], int AmCards)
 {
+	oman2.Akt_Menu = MGAME;
+	
+	int i = 0;
+	int j = 0;
+	for (i = 0; i < Number_Of_Menues; i++)
+	for (j = 0; j < ARRAY_LENGTH; j++)
+		oman2.objects[i][j].picture.picture = NULL;
+
 	oman2 = Load_Objects(oman2, "./resources/game_config.txt");
 
 	FILE *f;
@@ -307,7 +342,6 @@ int init_game(int AmPlayers, struct Card (*stack)[], int AmCards)
 	while (!IS_NULL(oman2.objects[oman2.Akt_Menu][index++]));
 	index--;
 
-	int i = 0;
 	for (i = 0; i < AmPlayers; i++)
 	{
 		Players[i].FoundPairs = 0;
@@ -344,6 +378,10 @@ int init_game(int AmPlayers, struct Card (*stack)[], int AmCards)
 
 	if (AmX * AmY < AmCards)
 		AmCards -= 2 * (int)((AmCards - AmX * AmY + 1) / 2);
+
+	srand(time(NULL)); /* start random number generater */
+
+	AktPlayer = rand() % AmPlayers;
 	
 	// Shuffle Cards in Stack - Knuth-Fisher-Yates shuffle **/
 	for (int j = AmCards - 1; j; j--) {
@@ -356,7 +394,7 @@ int init_game(int AmPlayers, struct Card (*stack)[], int AmCards)
 
 	// Draw Cards on gamefield
 
-	int j = 0;
+	j = 0;
 	
 	for (int x = 0; x < AmCards; x++)
 	{
@@ -386,4 +424,24 @@ int UpdateRemainingCards(int AmCards)
 	sprintf(c, "%d", NuOfRePairs);
 
 	oman2.objects[oman2.Akt_Menu][PosOfReCards].picture = Create_Picture_By_Text(oman2.objects[oman2.Akt_Menu][PosOfReCards].picture, concat("Number of remaining pairs: ", c), 0);
+}
+
+struct Player *SortWinner(int AmPlayer)
+{
+	// Sort Winner
+	int i = 0;
+	struct Player *Winner = (struct Player *)malloc(AmPlayer * sizeof(struct Player));
+	for (i = 0; i < AmPlayer; i++)
+	{
+		Winner[i].Name[0] = '\0';
+		int j = 0; // Search the position in list
+		while (Winner[j].FoundPairs > Players[i].FoundPairs && Winner[j].Name != '\0') j++;
+		int k = i; // Push the following items 1 down
+		for (; k > j && Winner[k].Name != '\0'; k--)
+			Winner[k] = Winner[k - 1];
+
+		Winner[j] = Players[i];
+	}
+
+	return Winner;
 }

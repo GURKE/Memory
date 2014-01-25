@@ -16,8 +16,10 @@
 
 #define HS_LENGTH 10
 
-char* gethighscore();
-void writehighscore(char name[], int moves);
-struct Object *GetHighscoreItems();
+char* Load_Highscore(int AmPlayers);
+int testhighscore(int moves, int AmPlayers);
+struct Object *GetHighscoreItems(int AmPlayers);
+void add_Highscoreitems(struct Player Players[8], int AmPlayers, int AmCards);                 // void: nichts zurückgeben, wert soll eingetragen werden
+print_Highscore(int AmPlayers);
 
 #endif

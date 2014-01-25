@@ -18,13 +18,10 @@ int dist2object(struct Object objects[], int x, int y, int type[], int AmOfTypes
 struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[]);
 int Chane_Menu(struct Objectmanager *oman, SDL_Surface *_screen, int Menu, int *Akt_Button);
 
-<<<<<<< HEAD
 int paint_screen(SDL_Surface *_screen);
 int dist2object(int x, int y, int type[], int AmOfTypes);
 struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[]);
-=======
 int freadInt(FILE *f, int *Output, char seperator); // Returns 0 for ok, -1 for Int is too big, -2 for wrong char detected
->>>>>>> Optimized Menu
 
 int Akt_Menu = 0;
 int Akt_Button = -1;
@@ -47,14 +44,14 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[])
 
 			for (int j = 0; j < oman.NumberOfButtons[AM]; j++)
 			{
-				int x = 0, y = 0, Type = 0;
+				int x = 0, y = 0, Type = 0, Value = 0;
 				
-				if (fscanf(f, "%d#%d#%d#", &x, &y, &Type) == EOF)
+				if (fscanf(f, "%d#%d#%d#%d#", &x, &y, &Type, &Value) == EOF)
 					return oman;
 				if (freadString(f, &c, '#', 50))
 					return oman;
 
-				oman.objects[AM][i] = O_New_Button(oman.objects[AM][i], c, Type, x, y);
+				oman.objects[AM][i] = O_New_Button(oman.objects[AM][i], c, Type, Value, x, y);
 				oman.Buttons[AM][j] = i;
 				i++;
 			}
@@ -72,7 +69,7 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[])
 				if (fscanf(f, "%d#%d#%d#%d#%d#", &oman.objects[AM][i].x, &oman.objects[AM][i].y, &oman.objects[AM][i].type, &oman.objects[AM][i].button.Type, &oman.objects[AM][i].button.Value) == EOF)
 					return oman;
 
-				if (oman.objects[AM][i].type == TButton)
+				if (oman.objects[AM][i].type == TButton || oman.objects[AM][i].type == TButtonWithFrame)
 				{
 					oman.objects[AM][i].button.Picture = load_picture(oman.objects[AM][i].button.Picture, c);
 					oman.objects[AM][i].picture = oman.objects[AM][i].button.Picture;
@@ -141,17 +138,23 @@ int paint_screen(SDL_Surface *_screen, struct Object objects[])
 		{
 			switch (objects[i].type)
 			{
-			case 1: // card
+			case TCard: // card
 				if (objects[i].card.visible)
 					SDL_BlitSurface(objects[i].picture.picture, NULL, _screen, Create_Rect_BO(&objects[i], 0)); // Foreground of the card
 				else
 					SDL_BlitSurface(Card_Background.picture, NULL, _screen, Create_Rect_BO(&objects[i], 0)); // Background of the card
 				break;
-			case 2: // Button
+			case TButton: // Button
 				if (objects[i].button.Clicked)
 					SDL_BlitSurface(objects[i].button.Clicked_Picture.picture, NULL, _screen, Create_Rect_BO(&objects[i], 0)); // Draw a clicked button
 				else
 					SDL_BlitSurface(objects[i].button.Picture.picture, NULL, _screen, Create_Rect_BO(&objects[i], 0)); // Foreground of the card
+				break; 
+			case TButtonWithFrame:
+				// Objects should be able to get selected
+				SDL_BlitSurface(objects[i].button.Picture.picture, NULL, _screen, Create_Rect_BO(&objects[i], 0)); // Draw a clicked button
+				if (objects[i].button.Clicked)
+					SDL_BlitSurface(objects[i].button.Clicked_Picture.picture, NULL, _screen, Create_Rect_BO(&objects[i], 1)); // Draw a clicked button
 				break;
 			default:
 				SDL_BlitSurface(objects[i].picture.picture, NULL, _screen, Create_Rect_BO(&objects[i], 0)); // Draws everything else

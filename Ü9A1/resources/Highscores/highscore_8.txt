@@ -1,0 +1,10 @@
+0_Heinz_100_
+0_Carl_100_
+1_Rudolf_75_
+2_Heinz_24_
+3_Emil_24_
+4_Gilbert_23_
+5_Haxebuchs_19_
+6_Carl_14_
+7_Gilbert_12_
+8_Peter_12_

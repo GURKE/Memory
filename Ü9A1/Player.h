@@ -15,7 +15,7 @@
 
 struct Player
 {
-	char Name[ARRAY_LENGTH];
+	char Name[20];
 	struct Object *ObPlayername;
 	struct Object *ObPlayerPoints;
 	int FoundPairs;
