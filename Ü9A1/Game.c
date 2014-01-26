@@ -7,7 +7,7 @@
 #include <Windows.h>
 
 #include "memory.h"
-#include "Card.h"
+//#include "Card.h"
 #include "Object.h"
 #include "Picture.h"
 #include "Objectmanager.h"
@@ -29,12 +29,11 @@
 SDL_Rect Gamefield;
 
 /* function declarations */
-int init_game(int AmPlayers, struct Card (*stack)[], int AmCards);
-int start_game(int amplayers, struct Card(*stack)[], int AmCards, int SizeX, int SizeY, struct Picture *BG, int Loading_Game, struct Player _players[]);
-int paint_screen();
-int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int amCards, SDL_Event event, int amplayers);
+int init_game(int AmPlayers, struct Pair (*stack)[], int AmCards);
+int start_game(int amplayers, struct Pair(*stack)[], int AmCards, int SizeX, int SizeY, struct Picture *BG, int Loading_Game, struct Player _players[]);
+int Mouse_Clicked(int *mod, int *card1, int *card2, struct Pair *cards[], int amCards, SDL_Event event, int amplayers);
 int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayers);
-int Save_Game(int amPlayers, struct Card *cards[]);
+int Save_Game(int amPlayers, struct Pair *cards[]);
 int Load_Game();
 int UpdateRemainingCards(int AmCards);
 struct Player *SortWinner(int AmPlayer);
@@ -59,7 +58,7 @@ struct Player Players[8];
 
 struct Player *GetWinner();
 
-int start_game(int amplayers, struct Card (*stack)[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[])
+int start_game(int amplayers, struct Pair (*stack)[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[])
 {
 	// SizeX && SizeY are the amount of Cards in x and y direction on the gamefield
 	Card_Background = *BG;
@@ -125,7 +124,7 @@ int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayer
 	paint_screen(_screen, oman2.objects[oman2.Akt_Menu]);
 }
 
-int Save_Game(int amPlayers, int amCards, struct Card *cards[])
+int Save_Game(int amPlayers, int amCards, struct Pair *cards[])
 {
 	FILE *f = fopen("Savegame.txt", "w");
 	if (fprintf(f, "") == EOF)
@@ -157,24 +156,22 @@ int Load_Game()
 	if (fscanf(f, "%d %d %d %s", amPlayers, GameSizeX, GameSizeY, &FileName) == EOF)
 		return FAILED_LOADING_SAVEGAME;
 
-	struct Card cards[ARRAY_LENGTH];
-	int amCards = init_cards(&cards, "Savegame_Cards.txt");
-	if (amCards < 0)
-		return amCards;
+	struct Pair cards[ARRAY_LENGTH];
+	//init_cards(&oman2, &cards, "Savegame_Cards.txt", Card_Background, MGAME);
 
 	Card_Background = load_picture(Card_Background, FileName);
 
-	start_game(amPlayers, cards, amCards, GameSizeX, GameSizeY, &Card_Background, 1, Players);
+	//start_game(amPlayers, cards, amCards, GameSizeX, GameSizeY, &Card_Background, 1, Players);
 
 	return 0;
 }
 
-int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int amCards, SDL_Event event, int amplayers)
+int Mouse_Clicked(int *mod, int *card1, int *card2, struct Pair *cards[], int amCards, SDL_Event event, int amplayers)
 {
-	int Types[] = { 1, 2 };
+	int Types[] = { TCard, TButton };
 	int actcard = dist2object(oman2.objects[oman2.Akt_Menu], event.button.x, event.button.y, Types, 2);
 
-	if (oman2.objects[oman2.Akt_Menu][actcard].type == 2) // Button
+	if (oman2.objects[oman2.Akt_Menu][actcard].type == TButton) // Button
 	{
 		switch (oman2.objects[oman2.Akt_Menu][actcard].button.Type) // Beenden
 		{
@@ -187,19 +184,19 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int am
 		default:	break;
 		}
 	}
-	else
+	else if (oman2.objects[oman2.Akt_Menu][actcard].type == TCard) // Card
 	{
 		switch (*mod)
 		{
 		case 0:	case 1: // tap card
-			if (actcard > -1 && oman2.objects[oman2.Akt_Menu][actcard].enabled && !oman2.objects[oman2.Akt_Menu][actcard].card.visible)
+			if (actcard > -1 && oman2.objects[oman2.Akt_Menu][actcard].enabled && !oman2.objects[oman2.Akt_Menu][actcard].button.Clicked)
 			{
 				if (*mod == 0)
 					*card1 = actcard;
 				else
 					*card2 = actcard;
 
-				oman2.objects[oman2.Akt_Menu][actcard].card.visible = 1;
+				oman2.objects[oman2.Akt_Menu][actcard].button.Clicked = 1;
 				(*mod)++;
 			}
 			break;
@@ -208,7 +205,7 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int am
 			if (amplayers == 1)
 				Players[AktPlayer].FoundPairs++;
 
-			if (oman2.objects[oman2.Akt_Menu][*card1].card.type == oman2.objects[oman2.Akt_Menu][*card2].card.type)
+			if (oman2.objects[oman2.Akt_Menu][*card1].button.Value == oman2.objects[oman2.Akt_Menu][*card2].button.Value)
 			{ // Pair found
 				oman2.objects[oman2.Akt_Menu][*card1].enabled = 0;
 				oman2.objects[oman2.Akt_Menu][*card2].enabled = 0;
@@ -232,8 +229,8 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Card *cards[], int am
 			}
 			else
 			{ // No pair found
-				oman2.objects[oman2.Akt_Menu][*card1].card.visible = 0;
-				oman2.objects[oman2.Akt_Menu][*card2].card.visible = 0;
+				oman2.objects[oman2.Akt_Menu][*card1].button.Clicked = 0;
+				oman2.objects[oman2.Akt_Menu][*card2].button.Clicked = 0;
 
 				char *c = (char *)malloc(sizeof(char));
 				sprintf(c, "%d", AktPlayer + 1);
@@ -320,7 +317,7 @@ struct Player *GetWinner()
 	return Players;
 }
 
-int init_game(int AmPlayers, struct Card (*stack)[], int AmCards)
+int init_game(int AmPlayers, struct Pair (*stack)[], int AmCards)
 {
 	oman2.Akt_Menu = MGAME;
 	
@@ -339,9 +336,13 @@ int init_game(int AmPlayers, struct Card (*stack)[], int AmCards)
 		return FAILED_LOADING_GAMEFIELD;
 
 	int index = 0;
-	while (!IS_NULL(oman2.objects[oman2.Akt_Menu][index++]));
-	index--;
-
+	while (!IS_NULL(oman2.objects[oman2.Akt_Menu][index]))
+	{
+		if (oman2.objects[oman2.Akt_Menu][index].type == TCard) // Removes the old cards after the first game
+			oman2.objects[oman2.Akt_Menu][index].picture.picture = NULL;
+		index++;
+	}
+	
 	for (i = 0; i < AmPlayers; i++)
 	{
 		Players[i].FoundPairs = 0;
@@ -370,8 +371,8 @@ int init_game(int AmPlayers, struct Card (*stack)[], int AmCards)
 		PosOfReCards = index++;
 	}
 
-	int SizeX = (*(*stack)[0].picture).picture->w;
-	int SizeY = (*(*stack)[0].picture).picture->h;
+	int SizeX = (*(*stack)[0].picture1).picture->w;
+	int SizeY = (*(*stack)[0].picture1).picture->h;
 
 	int AmX = Gamefield.w / SizeX;
 	int AmY = Gamefield.h / SizeY;
@@ -387,24 +388,22 @@ int init_game(int AmPlayers, struct Card (*stack)[], int AmCards)
 	for (int j = AmCards - 1; j; j--) {
 		int k = rand() % (j + 1);  /* random variable modulo remaining cards */
 		/* swap entries of fields i and j */
-		struct Card swap = (*stack)[j];
+		struct Pair swap = (*stack)[j];
 		(*stack)[j] = (*stack)[k];
 		(*stack)[k] = swap;
 	}
 
 	// Draw Cards on gamefield
 
+	oman2 = init_cards(&oman2, stack, "", Card_Background, MGAME);
+
 	j = 0;
 	
 	for (int x = 0; x < AmCards; x++)
 	{
-		if ((*(*stack)[j].picture).picture == NULL)
-			break;
+		if (oman2.objects[oman2.Akt_Menu][index].picture.picture == NULL)
+			break;		
 
-		oman2.objects[oman2.Akt_Menu][index].type = TCard; // oman2.objects[oman2.Akt_Menu] is card
-		oman2.objects[oman2.Akt_Menu][index].card = (*stack)[j++];
-		oman2.objects[oman2.Akt_Menu][index].picture = *oman2.objects[oman2.Akt_Menu][index].card.picture;
-		oman2.objects[oman2.Akt_Menu][index].card.picture = &oman2.objects[oman2.Akt_Menu][index].picture;
 		oman2.objects[oman2.Akt_Menu][index].enabled = 1;
 		oman2.objects[oman2.Akt_Menu][index].x = Gamefield.x + Gamefield.w / AmX * (x % AmX);
 		oman2.objects[oman2.Akt_Menu][index].y = Gamefield.y + Gamefield.h / AmY * (int)(x / AmX);

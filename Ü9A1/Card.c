@@ -6,90 +6,50 @@
 #include <SDL_ttf.h>
 #include <Windows.h>
 
-#include "cards.h"
-#inlcude "General_Proc.h"
+#include "Card.h"
+#include "Generel_Proc.h"
+#include "Pair.h"
 
-#define FailureReadingFile                  -1
+#pragma warning( disable : 4996 )
 
-int ReadDeck(pair* arraytofill, char* addresstoload)
-{
-	FILE* file = fopen(*adresstoload,"r");
 
-    struct pair availablecardsarray[ARRAY_LENGTH];
-	char c[ARRAY_LENGTH];
-
-    if (freadString(file,&c,'<',ARRAY_LENGTH))
-        return FailureReadingFile;
-    if (freadString(file,&c,'>',ARRAY_LENGTH))
-        return FailureReadingFile;
-    if (c != "deck")
-        return FailureReadingFile;
-
-    int i = -1;
-	while (c[0] != '\0')
+int init_cards_old(struct Card (*cards)[], char FileName[])
+{	
+	for (int i = 0; i < ARRAY_LENGTH; i++)
 	{
-	    int result;
-        if ((result = freadString(file,&c,"<+",ARRAY_LENGTH)) == 0) /*wenn das gleich null ist, ist es ein <*/
-        {
-            if (freadString(file,&c,">",ARRAY_LENGTH) == 0)
-            {
-                if (c != "pair")
-                    return FailureReadingFile;
-                else
-                    i++;
-            }
-            else
-                return FailureReadingFile;
-        }
-        else if (result == 1)
-        {
-            if (freadString(file,&c,':',ARRAY_LENGTH))
-                return FailureReadingFile;
-
-            switch(c)
-            {
-                case "id"
-                {
-                    if (freadString(file,&c,'\n',ARRAY_LENGTH))
-                        return FailureReadingFile;
-                    availablecardsarray[i].id = atoi(c);
-                    break;
-                }
-                case "difficulty"
-                {
-                    if (freadString(file,&c,'\n',ARRAY_LENGTH))
-                        return FailureReadingFile;
-                    availablecardsarray[i].difficulty = atoi(c);
-                    break;
-                }
-                case "location"
-                {
-                    if (freadString(file,&c,'\n',ARRAY_LENGTH))
-                        return FailureReadingFile;
-                    strcpy(&*availablecardsarray[i].location*,&*atoi(c)*);
-                    break;
-                }
-                case "topic"
-                {
-                    if (freadString(file,&c,'\n',ARRAY_LENGTH))
-                        return FailureReadingFile;
-                    availablecardsarray[i].topic = atoi(c);
-                    break;
-                }
-                case "visibility"
-                {
-                    if (freadString(file,&c,'\n',ARRAY_LENGTH))
-                        return FailureReadingFile;
-                    availablecardsarray[i].visibility = atoi(c);
-                    break;
-                }
-                defualt:
-                {
-                    break;
-                }
-            }
-        }
+		(*cards)[i].picture = (struct Picture *)malloc(sizeof(struct Picture));
+		(*cards)[i].picture->picture = NULL;
 	}
 
-    return availablecardsarray [i];
+	struct Pair pairs[ARRAY_LENGTH];
+	ReadDeck(&pairs, FileName);
+
+	int j = 0;
+	char c[100]; //string für den Dateipfad
+	while (1)
+	{
+		//*(*cards)[j].
+
+//		if (freadString(f, &c, "#", 100))
+			break;
+	//	if (fscanf(f, "%d#%d#\n", &(*cards)[j].difficulty, &(*cards)[j].type) == EOF) //End of File =  EOF
+			break;
+
+		*(*cards)[j].picture = load_picture(*(*cards)[j].picture, c);
+		
+
+		if ((*cards)[j].picture->picture == NULL)
+			return FAILED_LOADING_IMAGE;
+
+		(*cards)[j].visible = 0;
+		j++;
+	}
+
+	return 0;
+}
+
+int Save_Card(FILE *f, struct Card c)
+{
+	printf(f, "%d %d %d", c.difficulty, c.type, c.visible);
+	return 0;
 }

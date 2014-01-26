@@ -8,20 +8,17 @@
 
 #include "Objectmanager.h"
 #include "Object.h"
-#include "Card.h"
+//#include "Card.h"
 #include "Picture.h"
 #include "Button.h"
 #include "Label.h"
 
+struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[]);
 int paint_screen(SDL_Surface *_screen, struct Object objects[]);
 int dist2object(struct Object objects[], int x, int y, int type[], int AmOfTypes);
-struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[]);
-int Chane_Menu(struct Objectmanager *oman, SDL_Surface *_screen, int Menu, int *Akt_Button);
+int Change_Menu(struct Objectmanager *oman, SDL_Surface *_screen, int Menu, int *Akt_Button);
+struct Objectmanager init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu);
 
-int paint_screen(SDL_Surface *_screen);
-int dist2object(int x, int y, int type[], int AmOfTypes);
-struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[]);
-int freadInt(FILE *f, int *Output, char seperator); // Returns 0 for ok, -1 for Int is too big, -2 for wrong char detected
 
 int Akt_Menu = 0;
 int Akt_Button = -1;
@@ -48,7 +45,7 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[])
 				
 				if (fscanf(f, "%d#%d#%d#%d#", &x, &y, &Type, &Value) == EOF)
 					return oman;
-				if (freadString(f, &c, '#', 50))
+				if (freadString(f, &c, "#", 50) < 0)
 					return oman;
 
 				oman.objects[AM][i] = O_New_Button(oman.objects[AM][i], c, Type, Value, x, y);
@@ -64,7 +61,7 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[])
 			fscanf(f, "%d\n", &NumberOfObjects);
 			for (int j = 0; j < NumberOfObjects; j++)
 			{
-				if (freadString(f, &c, '#', 50))
+				if (freadString(f, &c, "#", 50) < 0)
 					return oman;
 				if (fscanf(f, "%d#%d#%d#%d#%d#", &oman.objects[AM][i].x, &oman.objects[AM][i].y, &oman.objects[AM][i].type, &oman.objects[AM][i].button.Type, &oman.objects[AM][i].button.Value) == EOF)
 					return oman;
@@ -74,7 +71,7 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[])
 					oman.objects[AM][i].button.Picture = load_picture(oman.objects[AM][i].button.Picture, c);
 					oman.objects[AM][i].picture = oman.objects[AM][i].button.Picture;
 
-					if (freadString(f, &c, '#', 50))
+					if (freadString(f, &c, "#", 50) < 0)
 						return oman;
 					
 					oman.objects[AM][i].button.Clicked_Picture = load_picture(oman.objects[AM][i].button.Clicked_Picture, c);
@@ -101,7 +98,7 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[])
 			{
 				if (fscanf(f, "%d#%d#", &oman.objects[AM][i].x, &oman.objects[AM][i].y) == EOF)
 					return oman;
-				if (freadString(f, &oman.objects[AM][i].label.Text, '#', 50))
+				if (freadString(f, &oman.objects[AM][i].label.Text, "#", 50) < 0)
 					return oman;
 
 				oman.objects[AM][i].picture = Create_Picture_By_Text(oman.objects[AM][i].picture, oman.objects[AM][i].label.Text, 0);
@@ -117,15 +114,6 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[])
 	return oman;
 }
 
-int freadInt(FILE *f, int *Output, char seperator) // Returns 0 for ok, -1 for Int is too big, -2 for wrong char detected
-{
-	char c[10];
-	int i = 0;
-	while ((c[i] = fgetc(f)) != seperator) if (i > 9) return -1; else if (c[i] >= '0' && c[i] <= 9) i++; else return -2;
-	*Output = atoi(c);
-	return 0;
-}
-
 int paint_screen(SDL_Surface *_screen, struct Object objects[])
 {
 	_screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE);
@@ -138,13 +126,7 @@ int paint_screen(SDL_Surface *_screen, struct Object objects[])
 		{
 			switch (objects[i].type)
 			{
-			case TCard: // card
-				if (objects[i].card.visible)
-					SDL_BlitSurface(objects[i].picture.picture, NULL, _screen, Create_Rect_BO(&objects[i], 0)); // Foreground of the card
-				else
-					SDL_BlitSurface(Card_Background.picture, NULL, _screen, Create_Rect_BO(&objects[i], 0)); // Background of the card
-				break;
-			case TButton: // Button
+			case TButton: case TCard: // Button
 				if (objects[i].button.Clicked)
 					SDL_BlitSurface(objects[i].button.Clicked_Picture.picture, NULL, _screen, Create_Rect_BO(&objects[i], 0)); // Draw a clicked button
 				else
@@ -176,7 +158,7 @@ int dist2object(struct Object objects[], int x, int y, int type[], int AmOfTypes
 	{
 		for (int j = 0; j < AmOfTypes; j++)
 		{
-			if (objects[i].enabled && !objects[i].card.visible && objects[i].type == type[j])
+			if (objects[i].enabled && objects[i].type == type[j] || (!objects[i].button.Clicked && type[j] == TCard))
 			{
 				double xrel = x - objects[i].x;
 				double yrel = y - objects[i].y;
@@ -199,4 +181,41 @@ int Change_Menu(struct Objectmanager *oman, SDL_Surface *_screen, int Menu, int 
 
 	paint_screen(_screen, oman->objects[oman->Akt_Menu]);
 	return -1;
+}
+
+struct Objectmanager init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu)
+{
+	if (FileName[0] != '\0') // Dont laod cards out of txt-file
+	{
+		for (int i = 0; i < ARRAY_LENGTH; i++)
+		{
+			(*cards)[i].picture1 = (struct Picture *)malloc(sizeof(struct Picture));
+			(*cards)[i].picture2 = (struct Picture *)malloc(sizeof(struct Picture));
+			(*cards)[i].picture1->picture = NULL;
+			(*cards)[i].picture2->picture = NULL;
+		}
+		ReadDeck(cards, FileName);
+	}
+
+	int index = 0;
+	while (!IS_NULL(oman->objects[Menu][index++]));
+	index--;
+
+	struct Object objects[ARRAY_LENGTH];
+	int j = 0;
+	while ((*cards)[j].id != -1)
+	{
+		oman->objects[Menu][index] = O_New_Card(oman->objects[Menu][index], 0, 0, (*cards)[j], *(*cards)[j].picture1, Background);
+
+		if (objects[index++].picture.picture == NULL)
+			return *oman;
+
+		oman->objects[Menu][index] = O_New_Card(oman->objects[Menu][index], 0, 0, (*cards)[j], *(*cards)[j].picture2, Background);
+
+		if (objects[index++].picture.picture == NULL)
+			return *oman;
+		j++;
+	}
+
+	return *oman;
 }

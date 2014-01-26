@@ -38,3 +38,20 @@
 ./resources/cards/Thema 1/Menge_Def_1_1.bmp#1#18#
 ./resources/cards/Thema 1/Euklidischer_Abstand_Def_2_1.bmp#1#19#
 ./resources/cards/Thema 1/Euklidischer_Abstand_2_1.bmp#1#19#
+
+
+
+	<pair>
+		+id:59
+		+difficulty:3
+		+topic:3
+		+firstpic:./resources/cards/Thema_3/Transponierte_einer_Matrix_3_3.bmp
+		+secondpic:./resources/cards/Thema_3/Transponierte_einer_Matrix_Def_3_3.bmp
+	</pair>
+	<pair>
+		+id:60
+		+difficulty:3
+		+topic:3
+		+firstpic:./resources/cards/Thema_3/Tridiagonalmatrix_3_3.bmp
+		+secondpic:./resources/cards/Thema_3/Tridiagonalmatrix_Def_3_3.bmp
+	</pair>

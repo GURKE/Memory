@@ -1,10 +1,11 @@
 #ifndef _OBJECT_H_
 #define _OBJECT_H_
 
-#include "Card.h"
+//#include "Card.h"
 #include "Picture.h"
 #include "Button.h"
 #include "Label.h"
+#include "Pair.h"
 
 #pragma warning( disable : 4996 )
 
@@ -34,7 +35,6 @@ struct Object
 	int enabled;
 
 	struct Picture picture;
-	struct Card card;
 	struct Button button;
 	struct Label label;
 };
@@ -44,6 +44,7 @@ SDL_Rect *Create_Rect_BO(struct Object *o, int move);
 int Save_Objects(struct Object objects[], FILE *f);
 struct Object O_New_Button(struct Object O, char Text[], int Button_Type, int Value, int X, int Y);
 struct Object O_New_Label(struct Object O, char Text[], int X, int Y);
+struct Object O_New_Card(struct Object O, int X, int Y, struct Pair pair, struct Picture pairpicture, struct Picture p);
 struct Object O_New_Object(struct Object O, int X, int Y, int Type, char Filename1[], char Filename2[], int ButtonType, int ButtonValue);
 
 #endif

@@ -7,7 +7,7 @@
 #include <Windows.h>
 
 #include "memory.h"
-#include "Card.h"
+//#include "Card.h"
 #include "Picture.h"
 #include "Objectmanager.h"
 #include "Highscore.h"
@@ -28,7 +28,7 @@ struct Picture card_background[ARRAY_LENGTH];
 int Akt_Background = 0; // The selected Background
 int Card_Frame_ID = 0; // ID of the Card_Frame_ID bmp
 
-struct Card cards[ARRAY_LENGTH];
+struct Pair cards[ARRAY_LENGTH];
 
 struct Objectmanager oman;
 
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
 	PlaySound(L"./resources/music/Bioweapon - Heretic.wav", NULL, SND_LOOP | SND_ASYNC);
 
 	init_card_background();
-	init_cards(&cards[0], "./resources/cards/cards.txt");
+	init_cards(&oman, &cards[0], "./resources/cards/cardlist.txt", card_background[Akt_Background], MMAIN_MENU);
 	init_menu();
 
 	SDL_Event event;
@@ -245,9 +245,9 @@ int init_Gamestart()
 int Print_Cards_In_List(int Lecture, int Offset_X)
 {
 	int i = 0;
-	while (i < 5 && cards[i].picture->picture != NULL)
+//	while (i < 5 && cards[i].picture->picture != NULL)
 	{
-		if (cards[i].)
+//		if (cards[i].)
 	}
 }
 

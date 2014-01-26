@@ -6,10 +6,11 @@
 #include <SDL_ttf.h>
 #include <Windows.h>
 #include "Object.h"
-#include "Card.h"
+//#include "Card.h"
 #include "Picture.h"
 #include "Button.h"
 #include "Label.h"
+#include "Pair.h"
 
 #pragma warning( disable : 4996 )
 
@@ -20,10 +21,11 @@ int enabled;
 struct Object O_New_Button(struct Object O, char Text[], int Button_Type, int Value, int X, int Y);
 struct Object O_New_Label(struct Object O, char Text[], int X, int Y);
 struct Object O_New_Object(struct Object O, int X, int Y, int Type, char Filename1[], char Filename2[], int ButtonType, int ButtonValue);
-	
+struct Object O_New_Card(struct Object O, int X, int Y, struct Pair pair, struct Picture pairpicture, struct Picture p);
+
 struct Picture picture;
 struct Picture *back_picture;
-struct Card card;
+struct Pair card;
 struct Button button;
 struct Label label;
 
@@ -56,9 +58,6 @@ int Save_Objects(struct Object objects[], FILE *f)
 		switch (objects[i].type)
 		{
 		case THard:
-			break;
-		case TCard:
-			Save_Card(f, objects[i].card);
 			break;
 		case TButton:
 			Save_Button(f, objects[i].button);
@@ -111,5 +110,23 @@ struct Object O_New_Object(struct Object O, int X, int Y, int Type, char Filenam
 	O.enabled = 1;
 	O.type = Type;
 	
+	return O;
+}
+
+struct Object O_New_Card(struct Object O, int X, int Y, struct Pair pair, struct Picture pairpicture, struct Picture p)
+{
+	O.x = X;
+	O.y = Y;
+
+	O.button.Picture = p;
+	O.button.Clicked_Picture = pairpicture;
+	O.picture = O.button.Picture;
+	O.button.Value = pair.id;
+	
+	O.type = TCard;
+	
+	O.enabled = 1;
+	O.button.Clicked = 0;
+
 	return O;
 }

@@ -1,7 +1,7 @@
 #ifndef _MEMORY_H_
 #define _MEMORY_H_
 
-#include "Card.h"
+//#include "Card.h"
 
 #pragma warning( disable : 4996 )
 
@@ -28,6 +28,6 @@
 SDL_Surface *_screen;
 
 struct Player *GetWinner();
-int start_game(int amplayers, struct Card(*stack)[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[]);
+int start_game(int amplayers, struct Pair(*stack)[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[]);
 
 #endif

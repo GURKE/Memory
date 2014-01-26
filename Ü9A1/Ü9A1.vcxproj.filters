@@ -54,7 +54,7 @@
     <ClInclude Include="Generel_Proc.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Card%28old%29.h">
+    <ClInclude Include="Pair.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Card.h">
@@ -98,7 +98,7 @@
     <ClCompile Include="Generel_Proc.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="Card%28old%29.c">
+    <ClCompile Include="Pair.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Card.c">
