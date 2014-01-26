@@ -12,7 +12,7 @@
 
 #define FailureReadingFile                  -1
 
-struct Pair* ReadDeck(struct Pair* arraytofill, char* addresstoload)
+int ReadDeck(struct Pair* arraytofill, char* addresstoload)
 {
 	FILE* file = fopen(addresstoload, "r");
 	
@@ -33,6 +33,8 @@ struct Pair* ReadDeck(struct Pair* arraytofill, char* addresstoload)
 		{
 			if (freadString(file, &c, ">", ARRAY_LENGTH) == 0)
 			{
+				if (IsIn(c, "/deck"))
+					return i - 1;
 				if (!IsIn(c, "pair"))
 					return FailureReadingFile;
 				else
@@ -91,5 +93,5 @@ struct Pair* ReadDeck(struct Pair* arraytofill, char* addresstoload)
 		}
 	}
 	
-	return arraytofill;
+	return i;
 }

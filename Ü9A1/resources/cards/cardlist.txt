@@ -80,8 +80,8 @@
 		+id:12
 		+difficulty:2
 		+topic:1
-		+firstpic:./resources/cards/Thema_1/Eukl+idischer_Abstand_2_1.bmp
-		+secondpic:./resources/cards/Thema_1/Eukl+idischer_Abstand_Def_2_1.bmp
+		+firstpic:./resources/cards/Thema_1/Euklidischer_Abstand_2_1.bmp
+		+secondpic:./resources/cards/Thema_1/Euklidischer_Abstand_Def_2_1.bmp
 	</pair>
 	<pair>
 		+id:13
@@ -95,14 +95,14 @@
 		+difficulty:1
 		+topic:1
 		+firstpic:./resources/cards/Thema_1/Implikation_1_1.bmp
-		+secondpic:./resources/cards/Thema_1/Implikation_1_1.bmp
+		+secondpic:./resources/cards/Thema_1/Implikation_Def_1_1.bmp
 	</pair>
 	<pair>
 		+id:15
 		+difficulty:2
 		+topic:1
 		+firstpic:./resources/cards/Thema_1/injektiv_2_1.bmp
-		+secondpic:./resources/cards/Thema_1/injektiv_2_1.bmp
+		+secondpic:./resources/cards/Thema_1/injektiv_Def_2_1.bmp
 	</pair>
 	<pair>
 		+id:16
@@ -129,8 +129,8 @@
 		+id:19
 		+difficulty:2
 		+topic:1
-		+firstpic:./resources/cards/Thema_1/Nornmalenvektor_Ebene_2_1.bmp
-		+secondpic:./resources/cards/Thema_1/Nornmalenvektor_Ebene_Def_2_1.bmp
+		+firstpic:./resources/cards/Thema_1/Normalenvektor_Ebene_2_1.bmp
+		+secondpic:./resources/cards/Thema_1/Normalenvektor_Ebene_Def_2_1.bmp
 	</pair>
 	<pair>
 		+id:20
@@ -150,8 +150,8 @@
 		+id:22
 		+difficulty:1
 		+topic:2
-		+firstpic:./resources/cards/Thema_2/Dimenstion_1_2.bmp
-		+secondpic:./resources/cards/Thema_2/Dimension_Def_1_2.bmp
+		+firstpic:./resources/cards/Thema_2/Dimension_2_2.bmp
+		+secondpic:./resources/cards/Thema_2/Dimension_Def_2_2.bmp
 	</pair>
 	<pair>
 		+id:23
@@ -164,8 +164,8 @@
 		+id:24
 		+difficulty:2
 		+topic:2
-		+firstpic:./resources/cards/Thema_2/Eukl+idischer_Vektorraum_2_2.bmp
-		+secondpic:./resources/cards/Thema_2/Eukl+idischer_Vektorraum_Def_2_2.bmp
+		+firstpic:./resources/cards/Thema_2/Euklidischer_Vektorraum_2_2.bmp
+		+secondpic:./resources/cards/Thema_2/Euklidischer_Vektorraum_Def_2_2.bmp
 	</pair>
 	<pair>
 		+id:25
@@ -178,8 +178,8 @@
 		+id:26
 		+difficulty:3
 		+topic:2
-		+firstpic:./resources/cards/Thema_2/Lineare_Abhängigkeit_3_2.bmp
-		+secondpic:./resources/cards/Thema_2/Lineare_Abhängigkeit_Def_3_2.bmp
+		+firstpic:./resources/cards/Thema_2/Lineare_Abhaengigkeit_3_2.bmp
+		+secondpic:./resources/cards/Thema_2/Lineare_Abhaengigkeit_Def_3_2.bmp
 	</pair>
 	<pair>
 		+id:27
@@ -213,29 +213,29 @@
 		+id:31
 		+difficulty:1
 		+topic:2
-		+firstpic:./resources/cards/Thema_2/Orthogonalbasis_1_2.bmp
-		+secondpic:./resources/cards/Thema_2/Orthogonalbasis_Def_1_2.bmp
+		+firstpic:./resources/cards/Thema_2/Orthogonalbasis_3_2.bmp
+		+secondpic:./resources/cards/Thema_2/Orthogonalbasis_Def_3_2.bmp
 	</pair>
 	<pair>
 		+id:32
 		+difficulty:1
 		+topic:2
-		+firstpic:./resources/cards/Thema_2/Orthogonalität_1_2.bmp
-		+secondpic:./resources/cards/Thema_2/Orthogonalität_Def_1_2.bmp
+		+firstpic:./resources/cards/Thema_2/Orthogonalitaet_2_2.bmp
+		+secondpic:./resources/cards/Thema_2/Orthogonalitaet_Def_2_2.bmp
 	</pair>
 	<pair>
 		+id:33
 		+difficulty:1
 		+topic:2
-		+firstpic:./resources/cards/Thema_2/Orthogonalsystem_1_2.bmp
-		+secondpic:./resources/cards/Thema_2/Orthogonalsystem_Def_1_2.bmp
+		+firstpic:./resources/cards/Thema_2/Orthogonalsystem_3_2.bmp
+		+secondpic:./resources/cards/Thema_2/Orthogonalsystem_Def_3_2.bmp
 	</pair>
 	<pair>
 		+id:34
 		+difficulty:1
 		+topic:2
-		+firstpic:./resources/cards/Thema_2/Orthonormalbasis_1_2.bmp
-		+secondpic:./resources/cards/Thema_2/Orthonormalbasis_Def_1_2.bmp
+		+firstpic:./resources/cards/Thema_2/Orthonormalbasis_3_2.bmp
+		+secondpic:./resources/cards/Thema_2/Orthonormalbasis_Def_3_2.bmp
 	</pair>
 	<pair>
 		+id:35
@@ -248,15 +248,15 @@
 		+id:36
 		+difficulty:3
 		+topic:2
-		+firstpic:./resources/cards/Thema_2/Skalarpodukt_3_2.bmp
-		+secondpic:./resources/cards/Thema_2/Skalarpodukt_Def_3_2.bmp
+		+firstpic:./resources/cards/Thema_2/Skalarprodukt_3_2.bmp
+		+secondpic:./resources/cards/Thema_2/Skalarprodukt_Def_3_2.bmp
 	</pair>
 	<pair>
 		+id:37
 		+difficulty:2
 		+topic:2
-		+firstpic:./resources/cards/Thema_2/Summe_Unterräume_2_2.bmp
-		+secondpic:./resources/cards/Thema_2/Summe_Unterräume_Def_2_2.bmp
+		+firstpic:./resources/cards/Thema_2/Summe_Unterraeume_2_2.bmp
+		+secondpic:./resources/cards/Thema_2/Summe_Unterraeume_Def_2_2.bmp
 	</pair>
 	<pair>
 		+id:38
@@ -326,8 +326,8 @@
 		+id:47
 		+difficulty:3
 		+topic:3
-		+firstpic:./resources/cards/Thema_3/LR_Zerlegung_3_3.bmp
-		+secondpic:./resources/cards/Thema_3/LR_Zerlegung_Def_3_3.bmp
+		+firstpic:./resources/cards/Thema_3/LR-Zerlegung_3_3.bmp
+		+secondpic:./resources/cards/Thema_3/LR-Zerlegung_Def_3_3.bmp
 	</pair>
 	<pair>
 		+id:48
@@ -368,8 +368,8 @@
 		+id:53
 		+difficulty:2
 		+topic:3
-		+firstpic:./resources/cards/Thema_3/R(mn)_2_3.bmp
-		+secondpic:./resources/cards/Thema_3/R(mn)_Def_2_3.bmp
+		+firstpic:./resources/cards/Thema_3/R-mn_2_3.bmp
+		+secondpic:./resources/cards/Thema_3/R-mn_Def_2_3.bmp
 	</pair>
 	<pair>
 		+id:54
@@ -389,15 +389,15 @@
 		+id:56
 		+difficulty:2
 		+topic:3
-		+firstpic:./resources/cards/Thema_3/Reguläre_Matrix_2_3.bmp
-		+secondpic:./resources/cards/Thema_3/Reguläre_Matrix_Def_2_3.bmp
+		+firstpic:./resources/cards/Thema_3/Regulaere_Matrix_2_3.bmp
+		+secondpic:./resources/cards/Thema_3/Regulaere_Matrix_Def_2_3.bmp
 	</pair>
 	<pair>
 		+id:57
 		+difficulty:2
 		+topic:3
-		+firstpic:./resources/cards/Thema_3/Singuläre_Matrix_2_3.bmp
-		+secondpic:./resources/cards/Thema_3/Singuläre_Matrix_Def_2_3.bmp
+		+firstpic:./resources/cards/Thema_3/Singulaere_Matrix_2_3.bmp
+		+secondpic:./resources/cards/Thema_3/Singulaere_Matrix_Def_2_3.bmp
 	</pair>
 	<pair>
 		+id:58
@@ -405,6 +405,25 @@
 		+topic:3
 		+firstpic:./resources/cards/Thema_3/Symmetrische_Matrix_2_3.bmp
 		+secondpic:./resources/cards/Thema_3/Symmetrische_Matrix_Def_2_3.bmp
+	</pair>	<pair>
+		+id:59
+		+difficulty:3
+		+topic:3
+		+firstpic:./resources/cards/Thema_3/Transponierte_einer_Matrix_3_3.bmp
+		+secondpic:./resources/cards/Thema_3/Transponierte_einer_Matrix_Def_3_3.bmp
+	</pair>
+	<pair>
+		+id:60
+		+difficulty:3
+		+topic:3
+		+firstpic:./resources/cards/Thema_3/Tridiagonalmatrix_3_3.bmp
+		+secondpic:./resources/cards/Thema_3/Tridiagonalmatrix_Def_3_3.bmp
+	</pair>
+	<pair>
+		+id:-1
+		+difficulty:-1
+		+topic:-1
+		+firstpic:-1
+		+secondpic:-1
 	</pair>
 </deck>
-

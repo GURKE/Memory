@@ -106,7 +106,7 @@ int start_game(int amplayers, struct Pair (*stack)[], int AmCards, struct Pictur
 int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayers)
 {
 	// Check for the button
-	int Types[] = { 2 };
+	int Types[] = { TButton };
 	int actbutton = dist2object(oman2.objects[oman2.Akt_Menu], event.button.x, event.button.y, Types, 1);
 	if (actbutton > -1)
 	{
@@ -184,7 +184,7 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Pair *cards[], int am
 		default:	break;
 		}
 	}
-	else if (oman2.objects[oman2.Akt_Menu][actcard].type == TCard) // Card
+	else  // Card
 	{
 		switch (*mod)
 		{
@@ -384,19 +384,23 @@ int init_game(int AmPlayers, struct Pair (*stack)[], int AmCards)
 
 	AktPlayer = rand() % AmPlayers;
 	
-	// Shuffle Cards in Stack - Knuth-Fisher-Yates shuffle **/
-	for (int j = AmCards - 1; j; j--) {
-		int k = rand() % (j + 1);  /* random variable modulo remaining cards */
-		/* swap entries of fields i and j */
-		struct Pair swap = (*stack)[j];
-		(*stack)[j] = (*stack)[k];
-		(*stack)[k] = swap;
+	// put random pairs into the deck
+
+	struct Pair RealStack[ARRAY_LENGTH];
+	int UsedCards = 0;
+	while (UsedCards < AmCards / 2)
+	{
+		int k = rand() % AmCards;  /* random variable modulo remaining cards */
+		if ((*stack)[k].id != -1)
+		{
+			RealStack[UsedCards++] = (*stack)[k];
+			(*stack)[k].id = -1;
+		}
 	}
 
 	// Draw Cards on gamefield
-
-	oman2 = init_cards(&oman2, stack, "", Card_Background, MGAME);
-
+	AmCards = init_cards(&oman2, &RealStack, "", Card_Background, MGAME, 0, AmCards);
+	
 	j = 0;
 	
 	for (int x = 0; x < AmCards; x++)

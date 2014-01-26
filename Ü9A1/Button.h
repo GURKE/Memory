@@ -18,12 +18,14 @@
 #define BSwitchBackground		10
 #define BSwitchSound			11
 #define BGameExit				12
-#define BArrow_Left_1			13
+#define BArrow					13
 #define BLoad					14
 #define BBack					15
 #define BGameExitConfirmation	16
 #define BStartGame				17
 #define BSwitchAmOfPlayer		18
+#define BUseCard				19
+#define BCard					20
 
 struct Button
 {

@@ -124,7 +124,7 @@ struct Object O_New_Card(struct Object O, int X, int Y, struct Pair pair, struct
 	O.button.Value = pair.id;
 	
 	O.type = TCard;
-	
+	O.button.Type = BUseCard;
 	O.enabled = 1;
 	O.button.Clicked = 0;
 

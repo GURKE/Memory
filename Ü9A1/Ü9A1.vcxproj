@@ -92,7 +92,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Button.h" />
-    <ClInclude Include="Card.h" />
     <ClInclude Include="Pair.h" />
     <ClInclude Include="Generel_Proc.h" />
     <ClInclude Include="Highscore.h" />
@@ -107,7 +106,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Card.c" />
     <ClCompile Include="Pair.c" />
     <ClCompile Include="Button.c" />
     <ClCompile Include="Generel_Proc.c" />

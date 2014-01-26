@@ -57,9 +57,6 @@
     <ClInclude Include="Pair.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Card.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -99,9 +96,6 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="Pair.c">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="Card.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

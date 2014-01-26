@@ -105,7 +105,7 @@ void add_Highscoreitems(struct Player Players[8], int AmPlayers, int AmCards)			
 		if (AmPlayers > 1)
 			Players[i].FoundPairs = ((2. / 5) * (Players[i].FoundPairs - 5) * (Players[i].FoundPairs - 5) * (Players[i].FoundPairs - 5) + 50) * AmCards / 20;					// (2/5*(Pairs-5)^3+50)*Cards/MaxCards
 		else
-			Players[i].FoundPairs = (100 - ((2. / 5) * (Players[i].FoundPairs - 5) * (Players[i].FoundPairs - 5) * (Players[i].FoundPairs - 5) + 50)) * AmCards / 20;					// (2/5*(Pairs-5)^3+50)*Cards/MaxCards
+			Players[i].FoundPairs = CalcPoints((double)Players[i].FoundPairs, (double)AmCards);// (100 - ((2. / 5) * (Players[i].FoundPairs - 5) * (Players[i].FoundPairs - 5) * (Players[i].FoundPairs - 5) + 50)) * AmCards / 20;					// (2/5*(Pairs-5)^3+50)*Cards/MaxCards
 
 		int ranking = testhighscore(Players[i].FoundPairs, AmPlayers);						// ranking ist zeile aus testhighscore 
 		if (ranking > -1)																	// wenn 0 wird nicht ausgeführt
@@ -122,6 +122,14 @@ void add_Highscoreitems(struct Player Players[8], int AmPlayers, int AmCards)			
 	}
 
 	print_Highscore(AmPlayers);
+}
+
+int CalcPoints(double x, double y)
+{
+	return 100 * x / y;
+	double PointsForMoves = ((sqrt(sqrt((int)((-x - 10) / 10) ^ 2))*((-x - 10) / 10) / sqrt((int)((-x - 10) / 10) ^ 2)) / 2 + 0.5);
+	double PointsForCards = ((sqrt(sqrt((int)((y - 10) / 10) ^ 2))*((y - 10) / 10) / sqrt((int)((y - 10) / 10) ^ 2)) / 2 + 0.5);
+	return (int)(100 * PointsForCards * PointsForMoves);
 }
 
 print_Highscore(int AmPlayers)

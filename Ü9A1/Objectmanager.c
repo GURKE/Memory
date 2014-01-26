@@ -17,7 +17,7 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[]);
 int paint_screen(SDL_Surface *_screen, struct Object objects[]);
 int dist2object(struct Object objects[], int x, int y, int type[], int AmOfTypes);
 int Change_Menu(struct Objectmanager *oman, SDL_Surface *_screen, int Menu, int *Akt_Button);
-struct Objectmanager init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu);
+int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu, int shuffle, int AmCards);
 
 
 int Akt_Menu = 0;
@@ -158,7 +158,7 @@ int dist2object(struct Object objects[], int x, int y, int type[], int AmOfTypes
 	{
 		for (int j = 0; j < AmOfTypes; j++)
 		{
-			if (objects[i].enabled && objects[i].type == type[j] || (!objects[i].button.Clicked && type[j] == TCard))
+			if (objects[i].type == type[j] && (objects[i].enabled || (!objects[i].button.Clicked && objects[i].enabled && objects[i].type == TCard)))
 			{
 				double xrel = x - objects[i].x;
 				double yrel = y - objects[i].y;
@@ -183,7 +183,7 @@ int Change_Menu(struct Objectmanager *oman, SDL_Surface *_screen, int Menu, int 
 	return -1;
 }
 
-struct Objectmanager init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu)
+int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu, int shuffle, int AmCards)
 {
 	if (FileName[0] != '\0') // Dont laod cards out of txt-file
 	{
@@ -194,28 +194,42 @@ struct Objectmanager init_cards(struct Objectmanager *oman, struct Pair(*cards)[
 			(*cards)[i].picture1->picture = NULL;
 			(*cards)[i].picture2->picture = NULL;
 		}
-		ReadDeck(cards, FileName);
+		AmCards = ReadDeck(cards, FileName);
 	}
 
 	int index = 0;
 	while (!IS_NULL(oman->objects[Menu][index++]));
 	index--;
 
+	int startindex = index;
+	
 	struct Object objects[ARRAY_LENGTH];
 	int j = 0;
-	while ((*cards)[j].id != -1)
+	while (j < AmCards / 2)
 	{
 		oman->objects[Menu][index] = O_New_Card(oman->objects[Menu][index], 0, 0, (*cards)[j], *(*cards)[j].picture1, Background);
 
 		if (objects[index++].picture.picture == NULL)
-			return *oman;
+			return AmCards;
 
 		oman->objects[Menu][index] = O_New_Card(oman->objects[Menu][index], 0, 0, (*cards)[j], *(*cards)[j].picture2, Background);
 
 		if (objects[index++].picture.picture == NULL)
-			return *oman;
+			return AmCards;
 		j++;
 	}
 
-	return *oman;
+	if (shuffle)
+	{
+		//shuffle cards in stack - knuth-fisher-yates shuffle **/
+		for (int j = index - 1; j > startindex; j--) {
+			int k = startindex + rand() % (AmCards);  /* random variable modulo remaining cards */
+			/* swap entries of fields i and j */
+			struct Object swap = oman->objects[oman->Akt_Menu][j];
+			oman->objects[oman->Akt_Menu][j] = oman->objects[oman->Akt_Menu][k];
+			oman->objects[oman->Akt_Menu][k] = swap;
+		}
+	}
+
+	return AmCards;
 }

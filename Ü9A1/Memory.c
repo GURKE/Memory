@@ -28,10 +28,14 @@ struct Picture card_background[ARRAY_LENGTH];
 int Akt_Background = 0; // The selected Background
 int Card_Frame_ID = 0; // ID of the Card_Frame_ID bmp
 
+
 struct Pair cards[ARRAY_LENGTH];
+
+int UsedPairs[40];
 
 struct Objectmanager oman;
 
+int Print_Cards_In_Top_List(int Lecture, int Offset_X);
 int init_card_background();
 int init_menu();
 int Paint_Highscore();
@@ -43,6 +47,9 @@ int Speaker = -1;
 int SoundOn = 1;
 
 int Site_Selected = -1; // ID of the picture of side_selected
+
+int Act_Lecture = 1;
+int Offset_Up_X = 0;
 
 int main(int argc, char *argv[])
 {
@@ -81,11 +88,13 @@ int main(int argc, char *argv[])
 
 	PlaySound(L"./resources/music/Bioweapon - Heretic.wav", NULL, SND_LOOP | SND_ASYNC);
 
-	init_card_background();
-	init_cards(&oman, &cards[0], "./resources/cards/cardlist.txt", card_background[Akt_Background], MMAIN_MENU);
+
 	init_menu();
+	init_card_background();
+	int AmCards = init_cards(&oman, &cards[0], "./resources/cards/cardlist.txt", card_background[Akt_Background], MSTART_MENU, 0, -1);
 
 	SDL_Event event;
+	int AmPlayers = 1;
 
 	while (SDL_WaitEvent(&event))
 	{
@@ -101,7 +110,7 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
-				int Types[] = { 2, 6 };
+				int Types[] = { TCard, TButton, 6 };
 				actobject = dist2object(oman.objects[oman.Akt_Menu], event.button.x, event.button.y, Types, 2);
 			}
 
@@ -140,9 +149,9 @@ int main(int argc, char *argv[])
 				{
 					return 0;
 				}
-				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BArrow_Left_1)
+				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BArrow)
                 {
-                    //Befehl
+					Move_Cards(oman.objects[oman.Akt_Menu][actobject].button.Value, AmCards);
                 }
 				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BSwitchBackground)
 				{
@@ -152,6 +161,10 @@ int main(int argc, char *argv[])
 				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BSwitchSound)
 				{
 					SwitchSound(-1);
+				}
+				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BUseCard)
+				{
+					AddCardToList(oman.objects[oman.Akt_Menu][actobject].button.Value);
 				}
 				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BStartGame)
 				{
@@ -166,11 +179,10 @@ int main(int argc, char *argv[])
 					strcpy(Players[6].Name, "Rudolf");
 					strcpy(Players[7].Name, "Haxebuchs");
 
-					int AmPlayers = 8;
 					int AmCards = 20;
 
 					int result = start_game(AmPlayers, cards, AmCards, &card_background[Akt_Background], 0, Players);
-					if (result == GEENDED) // Finishes Playing
+					if (result == GEENDED) // Finishes Playi	ng
 					{
 						Load_Highscore(AmPlayers);
 						add_Highscoreitems(GetWinner(), AmPlayers, AmCards);
@@ -179,11 +191,12 @@ int main(int argc, char *argv[])
 						Change_Menu(&oman, _screen, MHIGH_SCORE, &oman.Akt_Button);
 					}
 					else if (result == GECLOSED)
-						;
+						Change_Menu(&oman, _screen, MMAIN_MENU, &oman.Akt_Button);
 				}
 				else if (oman.objects[oman.Akt_Menu][actobject].button.Type == BSwitchAmOfPlayer)
 				{
 					int i = 0;
+					AmPlayers = oman.objects[MSTART_MENU][actobject].button.Value;
 					while (!IS_NULL(oman.objects[MSTART_MENU][i]))
 					{
 						if (oman.objects[MSTART_MENU][i].type == TSiteSelected)
@@ -237,17 +250,79 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-int init_Gamestart()
+int Move_Cards(int value, int AmCards)
 {
-	Print_Cards_In_List(1, 0);
+	switch (value)
+	{
+	case 1:
+		if (Offset_Up_X > 0)
+		{
+			Offset_Up_X--;
+			Print_Cards_In_Top_List(Act_Lecture, Offset_Up_X);
+		}
+		break;
+	case 2:
+		if (Offset_Up_X < AmCards - 5)
+		{
+			Offset_Up_X++;
+			Print_Cards_In_Top_List(Act_Lecture, Offset_Up_X);
+		}
+		break;
+	case 3: break;
+	case 4: break;
+	default: break;
+
+	}
 }
 
-int Print_Cards_In_List(int Lecture, int Offset_X)
+int AddCardToList(int id)
 {
 	int i = 0;
-//	while (i < 5 && cards[i].picture->picture != NULL)
+	while (UsedPairs != NULL)i++;
+	UsedPairs[i] = id;
+
+	Print_Cards_In_Top_List(Act_Lecture, Offset_Up_X);
+}
+
+int init_Gamestart()
+{
+	Print_Cards_In_Top_List(1, 0);
+}
+
+int Contains(int Array[], int number, int ArrayLength)
+{
+	for (int i = 0; i < ArrayLength; i++)
 	{
-//		if (cards[i].)
+		if (Array[i] == number)
+			return i;
+	}
+
+	return 0;
+}
+
+int Print_Cards_In_Top_List(int Lecture, int Offset_X)
+{
+	int i = 0;
+	int CardIDs[5];
+
+	while (i < 5 && cards[i].id != -1)
+	{
+		if (cards[i].topic == Lecture && !Contains(UsedPairs, cards[i].id, 40))
+			CardIDs[i] = cards[i++].id;
+	}
+
+	for (int j = 0; !IS_NULL(oman.objects[MSTART_MENU][j]); j++)
+	{
+		for (i = 0; i < 5; i++)
+		{
+			if (oman.objects[MSTART_MENU][j].button.Value == CardIDs[i] && oman.objects[MSTART_MENU][j].type == TCard)
+			{
+				oman.objects[MSTART_MENU][j].x = 100 + 220 * i;
+				oman.objects[MSTART_MENU][j].y = 260;
+				oman.objects[MSTART_MENU][j].enabled = 1;
+				oman.objects[MSTART_MENU][j].button.Clicked = 1;
+			}
+		}
 	}
 }
 

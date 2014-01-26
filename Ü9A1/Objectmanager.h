@@ -31,6 +31,6 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[]);
 int paint_screen(SDL_Surface *_screen, struct Object objects[]);
 int dist2object(struct Object objects[], int x, int y, int type[], int AmOfTypes);
 int Change_Menu(struct Objectmanager *oman, SDL_Surface *_screen, int Menu, int *Akt_Button);
-struct Objectmanager init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu);
+int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu, int shuffle, int AmCards);
 
 #endif // !_OBJECTMANAGER_H_

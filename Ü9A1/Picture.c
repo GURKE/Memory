@@ -29,6 +29,13 @@ struct Picture load_picture(struct Picture p, char Filename[FILENAME_LENGHT])
 	p.ID = PictureID++;
 	strncpy(p.filename, Filename, FILENAME_LENGHT);
 	p.picture = load_img(Filename);
+	if (p.picture == NULL)
+	{
+		fprintf(stderr, "Couldnt load picture: ");
+		fprintf(stderr, Filename);
+		fprintf(stderr, "\n");
+	}
+
 	return p;
 }
 

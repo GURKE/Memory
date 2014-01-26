@@ -41,17 +41,3 @@
 
 
 
-	<pair>
-		+id:59
-		+difficulty:3
-		+topic:3
-		+firstpic:./resources/cards/Thema_3/Transponierte_einer_Matrix_3_3.bmp
-		+secondpic:./resources/cards/Thema_3/Transponierte_einer_Matrix_Def_3_3.bmp
-	</pair>
-	<pair>
-		+id:60
-		+difficulty:3
-		+topic:3
-		+firstpic:./resources/cards/Thema_3/Tridiagonalmatrix_3_3.bmp
-		+secondpic:./resources/cards/Thema_3/Tridiagonalmatrix_Def_3_3.bmp
-	</pair>

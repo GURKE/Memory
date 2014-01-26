@@ -22,6 +22,6 @@ struct Pair
 	struct Picture *picture2;
 };
 
-struct Pair* ReadDeck(struct Pair* arraytofill, char* addresstoload);
+int ReadDeck(struct Pair* arraytofill, char* addresstoload);
 
 #endif
