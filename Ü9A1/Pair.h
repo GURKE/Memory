@@ -20,6 +20,7 @@ struct Pair
 	int visibility;
 	struct Picture *picture1;
 	struct Picture *picture2;
+	int ObjectId;
 };
 
 int ReadDeck(struct Pair* arraytofill, char* addresstoload);

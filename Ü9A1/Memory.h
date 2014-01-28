@@ -28,6 +28,6 @@
 SDL_Surface *_screen;
 
 struct Player *GetWinner();
-int start_game(int amplayers, struct Pair(*stack)[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[]);
+int start_game(int amplayers, struct Object Cards[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[], struct Pair(*cards)[], int res1080p);
 
 #endif

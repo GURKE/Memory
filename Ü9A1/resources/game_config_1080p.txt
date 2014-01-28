@@ -1,0 +1,27 @@
+0
+	B 1
+		80#1015#12#0#Close#
+	O 2
+		./resources/Game_Background_1080p.bmp#0#0#0#0#-1#
+		./resources/application_exit.bmp#20#1005#2#12#0#./resources/application_exit.bmp#	
+	L 0
+	T 0
+1
+	B 2
+		500#550#16#0#Yes#
+		600#550#15#0#No#
+	O 0
+	L 1
+		500#500#Do you really want to exit the game?#
+	T 0
+2
+	B 1
+		300#700#4#0#Continue#
+	O 1
+		./resources/Highscore_Line.bmp#248#117#4#0#-1#
+	L 4
+		500#50#Statistics#
+		264#132#Rank#
+		364#132#Name#
+		845#132#Moves#
+	T 0

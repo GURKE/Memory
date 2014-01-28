@@ -147,6 +147,13 @@ print_Highscore(int AmPlayers)
 
 struct Object *GetHighscoreItems(int AmPlayers)
 {
+	for (int i = 0; i < 10; i++)
+	{
+		Highscoreitems[i]->moves = -1;
+		Highscoreitems[i]->name[0] = '\0';
+		Highscoreitems[i]->ranking = -1;
+	}
+
 	Load_Highscore(AmPlayers);
 
 	struct Object *o = (struct Object*)malloc(2 * HS_LENGTH * sizeof(struct Object));

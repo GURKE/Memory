@@ -43,6 +43,9 @@ struct Picture Create_Picture_By_Text(struct Picture p, char Text[FILENAME_LENGH
 {
 	p.ID = PictureID++;
 	strncpy(p.filename, Text, FILENAME_LENGHT);
+	if (p.filename[0] == '\0')
+		p.filename[0] = ' ';
+
 	if (Highlighted)
 		p.picture = TTF_RenderText_Solid(font, p.filename, textColorH);
 	else

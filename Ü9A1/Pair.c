@@ -82,7 +82,7 @@ int ReadDeck(struct Pair* arraytofill, char* addresstoload)
 			{
 				if (freadString(file, &c, "\n", ARRAY_LENGTH))
 					return FailureReadingFile;
-				arraytofill[i].topic = atoi(c);
+				arraytofill[i].topic = atoi(c) - 1;
 			}
 			else if (IsIn(c, "visibility"))
 			{

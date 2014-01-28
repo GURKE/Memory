@@ -11,8 +11,9 @@
 		./resources/advancedsettings.bmp#480#510#2#6#0#./resources/advancedsettings.bmp#
 		./resources/application_exit.bmp#480#580#2#0#0#./resources/application_exit.bmp#
 	L 0
+	T 0
 1
-	B 9
+	B 10
 		540#750#5#0#Menu#
 		500#700#3#1#1#
 		530#700#3#2#2#
@@ -22,6 +23,7 @@
 		650#700#3#6#6#
 		680#700#3#7#7#
 		710#700#3#8#8#
+		750#800#23#0#Clear Highscore#
 	O 2
 		./resources/Highscore_Background.bmp#0#0#0#0#-1#
 		./resources/Highscores/Site_Selected.bmp#492#695#8#0#-1#
@@ -40,37 +42,46 @@
 		264#524#8#
 		264#573#9#
 		264#622#10#
+	T 0
 2
-	B 3
-		540#520#7#0#On#
-		580#520#8#0#Off#
+	B 9
+		540#290#7#0#On#
+		580#290#8#0#Off#
 		540#800#5#0#Menu#
+		540#400#22#0#+ Noisecontrollers ENCHD#
+		540#430#22#1#+ Bioweapen - Heretic#
+		540#460#22#2#+ The Vision - Set U Free#
+		540#490#22#3#+ David Guetta Memories#
+		540#520#22#4#+ David Guetta Sound of Letting Go#
+		540#570#25#0#Set Resolution to FullHD#
 	O 7
 		./resources/Options_Background.bmp#0#0#0#0#-1#
-		./resources/Sound.bmp#490#510#2#11#-1#./resources/Soundless.bmp#	
+		./resources/Sound.bmp#490#285#2#11#-1#./resources/Soundless.bmp#	
 		./resources/card_backgrounds/Background1.bmp#210#640#6#10#0#./resources/Card_Selected.bmp#
 		./resources/card_backgrounds/Background2.bmp#430#640#6#10#1#./resources/Card_Selected.bmp#
 		./resources/card_backgrounds/Background3.bmp#650#640#6#10#2#./resources/Card_Selected.bmp#
 		./resources/card_backgrounds/Background4.bmp#870#640#6#10#3#./resources/Card_Selected.bmp#
 		./resources/Card_Chosen.bmp#203#633#7#0#-1#
-	L 2
+	L 3
 		540#600#Background#
-		540#450#Sound#
+		540#230#Sound#
+		540#350#Backgroundmusic#
+	T 0
 3
 	B 13
-		110#180#0#0#Lecture 1#
-		380#180#0#0#Lecture 2#
-		650#180#0#0#Lecture 3#
+		110#180#21#0#Lecture 1#
+		380#180#21#1#Lecture 2#
+		650#180#21#2#Lecture 3#
 		580#900#17#0#Start Game#
 		590#960#5#0#Main Menu#
-		60#810#18#1#1#
-		109#810#18#2#2#
-		158#810#18#3#3#
-		207#810#18#4#4#
-		256#810#18#5#5#
-		305#810#18#6#6#
-		354#810#18#7#7#
-		403#810#18#8#8#
+		60#710#18#1#1#
+		109#710#18#2#2#
+		158#710#18#3#3#
+		207#710#18#4#4#
+		256#710#18#5#5#
+		305#710#18#6#6#
+		354#710#18#7#7#
+		403#710#18#8#8#
 	O 9
 		./resources/Game_Start_Menu/Background.bmp#0#0#0#0#-1#
 		./resources/Game_Start_Menu/Back.bmp#40#320#2#13#1#./resources/Game_Start_Menu/Back.bmp#
@@ -80,6 +91,31 @@
 		./resources/Game_Start_Menu/Lecture1.bmp#30#160#0#0#0#
 		./resources/Game_Start_Menu/Lecture2.bmp#300#160#0#0#0#
 		./resources/Game_Start_Menu/Lecture3.bmp#570#160#0#0#0#
-		./resources/Highscores/Site_Selected.bmp#52#805#8#0#-1#
+		./resources/Highscores/Site_Selected.bmp#52#705#8#0#-1#
+	L 2
+		60#680#How many Players?#
+		60#780#Playernames:#
+	T 8
+		60#810#0#Player 1#
+		360#810#1#Player 2#
+		660#810#2#Player 3#
+		960#810#3#Player 4#
+		60#840#4#Player 5#
+		360#840#5#Player 6#
+		660#840#6#Player 7#
+		960#840#7#Player 8#
+4
+	B 2
+		500#550#16#0#Yes#
+		600#550#15#0#No#
+	O 0
 	L 1
-		60#750#How many Players?#
+		400#200#Are you sure you want to delete your achievments?# 
+	T 0
+5
+	B 1
+		500#550#24#0#Ok#
+	O 0
+	L 1
+		400#200#You have to choose more cards too start!# 
+	T 0

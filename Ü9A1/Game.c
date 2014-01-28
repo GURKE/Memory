@@ -29,9 +29,9 @@
 SDL_Rect Gamefield;
 
 /* function declarations */
-int init_game(int AmPlayers, struct Pair (*stack)[], int AmCards);
-int start_game(int amplayers, struct Pair(*stack)[], int AmCards, int SizeX, int SizeY, struct Picture *BG, int Loading_Game, struct Player _players[]);
-int Mouse_Clicked(int *mod, int *card1, int *card2, struct Pair *cards[], int amCards, SDL_Event event, int amplayers);
+int init_game(amplayers, Cards, AmPairs, cards, res1080p);
+int start_game(int amplayers, struct Object Cards[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[], struct Pair(*cards)[], int res1080p);
+int Mouse_Clicked(int *mod, int *card1, int *card2, int amCards, SDL_Event event, int amplayers);
 int Mouse_Motion(int *mod, int *card1, int *card2, SDL_Event event, int amplayers);
 int Save_Game(int amPlayers, struct Pair *cards[]);
 int Load_Game();
@@ -58,7 +58,7 @@ struct Player Players[8];
 
 struct Player *GetWinner();
 
-int start_game(int amplayers, struct Pair (*stack)[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[])
+int start_game(int amplayers, struct Object Cards[], int AmCards, struct Picture *BG, int Loading_Game, struct Player _players[], struct Pair(*cards)[], int res1080p)
 {
 	// SizeX && SizeY are the amount of Cards in x and y direction on the gamefield
 	Card_Background = *BG;
@@ -76,10 +76,10 @@ int start_game(int amplayers, struct Pair (*stack)[], int AmCards, struct Pictur
 	if (amplayers > 8)
 		return TOO_MANY_PLAYERS;
 	
-	for (size_t i = 0; i < amplayers; i++)
+	for (int i = 0; i < amplayers; i++)
 		Players[i] = _players[i];
 
-	int result = init_game(amplayers, stack, AmCards);
+	int result = init_game(amplayers, Cards, AmCards, cards, res1080p);
 	if (result)
 		return result;
 
@@ -91,7 +91,7 @@ int start_game(int amplayers, struct Pair (*stack)[], int AmCards, struct Pictur
 			break;
 		if (event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)
 		{
-			int result = Mouse_Clicked(mod, card1, card2, &stack, AmCards, event, amplayers);
+			int result = Mouse_Clicked(mod, card1, card2, AmCards, event, amplayers);
 			if (result == GECLOSED || result == GEENDED)
 				return result;
 
@@ -166,7 +166,7 @@ int Load_Game()
 	return 0;
 }
 
-int Mouse_Clicked(int *mod, int *card1, int *card2, struct Pair *cards[], int amCards, SDL_Event event, int amplayers)
+int Mouse_Clicked(int *mod, int *card1, int *card2, int amCards, SDL_Event event, int amplayers)
 {
 	int Types[] = { TCard, TButton };
 	int actcard = dist2object(oman2.objects[oman2.Akt_Menu], event.button.x, event.button.y, Types, 2);
@@ -179,7 +179,7 @@ int Mouse_Clicked(int *mod, int *card1, int *card2, struct Pair *cards[], int am
 		case BBack: Change_Menu(&oman2, _screen, MGAME, &oman2.Akt_Button); return 0;
 		case BGameExitConfirmation: return GECLOSED;
 		case BContinue: return GEENDED;
-		case BSave: Save_Game(amplayers, amCards, cards); break;
+		case BSave: Save_Game(amplayers, amCards, 0); break;
 		case BLoad: Load_Game(); break;
 		default:	break;
 		}
@@ -317,7 +317,7 @@ struct Player *GetWinner()
 	return Players;
 }
 
-int init_game(int AmPlayers, struct Pair (*stack)[], int AmCards)
+int init_game(int AmPlayers, struct Object Cards[], int AmPairs, struct Pair(*cards)[], int res1080p)
 {
 	oman2.Akt_Menu = MGAME;
 	
@@ -327,11 +327,20 @@ int init_game(int AmPlayers, struct Pair (*stack)[], int AmCards)
 	for (j = 0; j < ARRAY_LENGTH; j++)
 		oman2.objects[i][j].picture.picture = NULL;
 
-	oman2 = Load_Objects(oman2, "./resources/game_config.txt");
-
 	FILE *f;
-	f = fopen("./resources/config.txt", "r");
-		
+
+	if (res1080p)
+	{
+		oman2 = Load_Objects(oman2, "./resources/game_config_1080p.txt");
+		_screen = SDL_SetVideoMode(1920, 1080, SCREEN_BPP, SDL_HWSURFACE | SDL_FULLSCREEN);
+		f = fopen("./resources/config_1080p.txt", "r");
+	}
+	else
+	{
+		oman2 = Load_Objects(oman2, "./resources/game_config.txt");
+		f = fopen("./resources/config.txt", "r");
+	}
+	
 	if (fscanf(f, "%d %d %d %d", &Gamefield.x, &Gamefield.y, &Gamefield.w, &Gamefield.h) == EOF)
 		return FAILED_LOADING_GAMEFIELD;
 
@@ -363,7 +372,7 @@ int init_game(int AmPlayers, struct Pair (*stack)[], int AmCards)
 	if (fscanf(f, "%d %d", &X, &Y) != EOF)
 	{
 		char *c = (char *)malloc(sizeof(char));
-		NuOfRePairs = AmCards / 2;
+		NuOfRePairs = AmPairs / 2;
 		sprintf(c, "%d", NuOfRePairs);
 
 		oman2.objects[oman2.Akt_Menu][index] = O_New_Label(oman2.objects[oman2.Akt_Menu][index], concat("Number of remaining pairs: ", c), X, Y);
@@ -371,14 +380,14 @@ int init_game(int AmPlayers, struct Pair (*stack)[], int AmCards)
 		PosOfReCards = index++;
 	}
 
-	int SizeX = (*(*stack)[0].picture1).picture->w;
-	int SizeY = (*(*stack)[0].picture1).picture->h;
+	int SizeX = Cards[0].picture.picture->w;
+	int SizeY = Cards[0].picture.picture->h;
 
-	int AmX = Gamefield.w / SizeX;
-	int AmY = Gamefield.h / SizeY;
+	int AmX = Gamefield.w / (SizeX + 5);
+	int AmY = Gamefield.h / (SizeY + 5);
 
-	if (AmX * AmY < AmCards)
-		AmCards -= 2 * (int)((AmCards - AmX * AmY + 1) / 2);
+	if (AmX * AmY < AmPairs * 2)
+		AmPairs -= (int)((2 * AmPairs - AmX * AmY + 1) / 2);
 
 	srand(time(NULL)); /* start random number generater */
 
@@ -388,22 +397,28 @@ int init_game(int AmPlayers, struct Pair (*stack)[], int AmCards)
 
 	struct Pair RealStack[ARRAY_LENGTH];
 	int UsedCards = 0;
-	while (UsedCards < AmCards / 2)
+		
+	while (UsedCards < AmPairs)
 	{
-		int k = rand() % AmCards;  /* random variable modulo remaining cards */
-		if ((*stack)[k].id != -1)
+		int k = rand() % AmPairs;  /* random variable modulo remaining cards */
+		int AlreadyInUse = 0;
+		for (int i = 0; i < UsedCards; i++)
+		if (RealStack[i].id == (*cards)[Cards[k].PairID].id)
 		{
-			RealStack[UsedCards++] = (*stack)[k];
-			(*stack)[k].id = -1;
+			AlreadyInUse = 1;
+			break;
 		}
+
+		if (!AlreadyInUse)
+			RealStack[UsedCards++] = (*cards)[Cards[k].PairID];
 	}
 
 	// Draw Cards on gamefield
-	AmCards = init_cards(&oman2, &RealStack, "", Card_Background, MGAME, 0, AmCards);
+	AmPairs = init_cards(&oman2, &RealStack, "", Card_Background, MGAME, 1, AmPairs, 0);
 	
 	j = 0;
 	
-	for (int x = 0; x < AmCards; x++)
+	for (int x = 0; x < AmPairs * 2; x++)
 	{
 		if (oman2.objects[oman2.Akt_Menu][index].picture.picture == NULL)
 			break;		
@@ -415,7 +430,7 @@ int init_game(int AmPlayers, struct Pair (*stack)[], int AmCards)
 	}
 
 
-	UpdateRemainingCards(AmCards);
+	UpdateRemainingCards(AmPairs);
 
 	return 0;
 }

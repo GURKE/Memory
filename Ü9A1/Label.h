@@ -9,6 +9,7 @@
 struct Label
 {
 	char Text[Text_length];
+	int Textboxvalue;
 };
 
 #endif

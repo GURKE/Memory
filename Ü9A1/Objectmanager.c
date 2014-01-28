@@ -17,8 +17,7 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[]);
 int paint_screen(SDL_Surface *_screen, struct Object objects[]);
 int dist2object(struct Object objects[], int x, int y, int type[], int AmOfTypes);
 int Change_Menu(struct Objectmanager *oman, SDL_Surface *_screen, int Menu, int *Akt_Button);
-int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu, int shuffle, int AmCards);
-
+int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu, int shuffle, int AmPairs, int onlyForeground);
 
 int Akt_Menu = 0;
 int Akt_Button = -1;
@@ -108,7 +107,31 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[])
 				oman.objects[AM][i].enabled = 1;
 				i++;
 			}
+			fscanf(f, "%s", &c);
 		}
+
+		if (c[0] == 'T')
+		{
+			int NumberOfTextboxes = 0;
+			fscanf(f, "%d", &NumberOfTextboxes);
+			for (int j = 0; j < NumberOfTextboxes; j++)
+			{
+				if (fscanf(f, "%d#%d#%d#", &oman.objects[AM][i].x, &oman.objects[AM][i].y, &oman.objects[AM][i].label.Textboxvalue) == EOF)
+					return oman;
+				if (freadString(f, &oman.objects[AM][i].label.Text, "#", 50) < 0)
+					return oman;
+
+				oman.objects[AM][i].type = TTextbox;
+				oman.objects[AM][i].enabled = 1;
+
+				oman.objects[AM][i].picture = Create_Picture_By_Text(oman.objects[AM][i].picture, oman.objects[AM][i].label.Text, 0);
+				if (oman.objects[AM][i].picture.picture == NULL)
+					return oman;
+
+				i++;
+			}
+		}
+		oman.objects[AM][i].picture.picture = NULL;
 	}
 
 	return oman;
@@ -116,7 +139,6 @@ struct Objectmanager Load_Objects(struct Objectmanager oman, char Filename[])
 
 int paint_screen(SDL_Surface *_screen, struct Object objects[])
 {
-	_screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE);
 	SDL_FillRect(_screen, NULL, _bg_color);
 
 	int i = 0;
@@ -183,7 +205,7 @@ int Change_Menu(struct Objectmanager *oman, SDL_Surface *_screen, int Menu, int 
 	return -1;
 }
 
-int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu, int shuffle, int AmCards)
+int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[], struct Picture Background, int Menu, int shuffle, int AmPairs, int onlyForeground)
 {
 	if (FileName[0] != '\0') // Dont laod cards out of txt-file
 	{
@@ -194,7 +216,7 @@ int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[
 			(*cards)[i].picture1->picture = NULL;
 			(*cards)[i].picture2->picture = NULL;
 		}
-		AmCards = ReadDeck(cards, FileName);
+		AmPairs = ReadDeck(cards, FileName);
 	}
 
 	int index = 0;
@@ -205,17 +227,25 @@ int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[
 	
 	struct Object objects[ARRAY_LENGTH];
 	int j = 0;
-	while (j < AmCards / 2)
+	while (j < AmPairs)
 	{
 		oman->objects[Menu][index] = O_New_Card(oman->objects[Menu][index], 0, 0, (*cards)[j], *(*cards)[j].picture1, Background);
+		(*cards)[j].ObjectId = index;
+		oman->objects[Menu][index].PairID = j;
 
 		if (objects[index++].picture.picture == NULL)
-			return AmCards;
+			return AmPairs;
 
-		oman->objects[Menu][index] = O_New_Card(oman->objects[Menu][index], 0, 0, (*cards)[j], *(*cards)[j].picture2, Background);
+		if (!onlyForeground)
+		{
+			oman->objects[Menu][index] = O_New_Card(oman->objects[Menu][index], 0, 0, (*cards)[j], *(*cards)[j].picture2, Background);
+			(*cards)[j].ObjectId = index;
+			oman->objects[Menu][index].PairID = j;
 
-		if (objects[index++].picture.picture == NULL)
-			return AmCards;
+			if (objects[index++].picture.picture == NULL)
+				return AmPairs;
+		}
+
 		j++;
 	}
 
@@ -223,7 +253,7 @@ int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[
 	{
 		//shuffle cards in stack - knuth-fisher-yates shuffle **/
 		for (int j = index - 1; j > startindex; j--) {
-			int k = startindex + rand() % (AmCards);  /* random variable modulo remaining cards */
+			int k = startindex + rand() % (AmPairs);  /* random variable modulo remaining cards */
 			/* swap entries of fields i and j */
 			struct Object swap = oman->objects[oman->Akt_Menu][j];
 			oman->objects[oman->Akt_Menu][j] = oman->objects[oman->Akt_Menu][k];
@@ -231,5 +261,5 @@ int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[
 		}
 	}
 
-	return AmCards;
+	return AmPairs * 2;
 }

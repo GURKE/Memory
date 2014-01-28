@@ -1,14 +1,11 @@
 0
-	B 3	
+	B 1
 		80#959#12#0#Close#
-		250#959#1#0#Save#
-		420#959#2#0#Load#
-	O 4
+	O 2
 		./resources/Game_Background.bmp#0#0#0#0#-1#
 		./resources/application_exit.bmp#20#949#2#12#0#./resources/application_exit.bmp#	
-		./resources/gnome_media_floppy.bmp#190#949#2#1#0#./resources/gnome_media_floppy.bmp#	
-		./resources/load.bmp#360#954#2#2#0#./resources/load.bmp#
 	L 0
+	T 0
 1
 	B 2
 		500#550#16#0#Yes#
@@ -16,6 +13,7 @@
 	O 0
 	L 1
 		500#500#Do you really want to exit the game?#
+	T 0
 2
 	B 1
 		300#700#4#0#Continue#
@@ -26,3 +24,4 @@
 		264#132#Rank#
 		364#132#Name#
 		845#132#Moves#
+	T 0

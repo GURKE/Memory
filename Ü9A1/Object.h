@@ -10,7 +10,7 @@
 #pragma warning( disable : 4996 )
 
 #define SCREEN_WIDTH    1280
-#define SCREEN_HEIGHT   1024
+#define SCREEN_HEIGHT	1024
 #define SCREEN_BPP      32
 
 Uint32 _bg_color;
@@ -33,6 +33,7 @@ struct Object
 	int x, y;
 	int type;
 	int enabled;
+	int PairID;
 
 	struct Picture picture;
 	struct Button button;

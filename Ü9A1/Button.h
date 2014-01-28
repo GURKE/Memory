@@ -26,6 +26,14 @@
 #define BSwitchAmOfPlayer		18
 #define BUseCard				19
 #define BCard					20
+#define BSwitchLecture			21
+#define BSwitchSong				22
+#define BClearHighscore			23
+#define BOk						24
+#define BSet1080p				25
+#define BUseAll					26
+
+
 
 struct Button
 {
