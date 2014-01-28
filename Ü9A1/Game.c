@@ -304,7 +304,7 @@ int GameEnd(int amPlayers)
 		oman2.objects[oman2.Akt_Menu][index].type = THighscoreitem; 
 		index++;
 
-		char c[3];
+		char c[10];
 		sprintf(&c, "%d", Winner[j].FoundPairs);
 		oman2.objects[oman2.Akt_Menu][index] = O_New_Label(oman2.objects[oman2.Akt_Menu][index], c, 845, 181 + j * 49);
 		oman2.objects[oman2.Akt_Menu][index].type = THighscoreitem; 

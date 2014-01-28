@@ -162,7 +162,7 @@ struct Object *GetHighscoreItems(int AmPlayers)
 		*o = O_New_Label(*o, Highscoreitems[AmPlayers - 1][i].name, 364, 181 + 49 * i);
 		o->type = THighscoreitem;
 		o++;
-		char c[4];
+		char c[10];
 		sprintf(c, "%d", Highscoreitems[AmPlayers - 1][i].moves);
 
 		*o = O_New_Label(*o, c, 845, 181 + 49 * i);
