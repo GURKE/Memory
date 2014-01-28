@@ -54,8 +54,9 @@
 		540#490#22#3#+ David Guetta Memories#
 		540#520#22#4#+ David Guetta Sound of Letting Go#
 		540#570#25#0#Set Resolution to FullHD#
-	O 7
+	O 8
 		./resources/Options_Background.bmp#0#0#0#0#-1#
+		./resources/1080p.bmp#470#555#2#25#-1#./resources/1080p.bmp#
 		./resources/Sound.bmp#490#285#2#11#-1#./resources/Soundless.bmp#	
 		./resources/card_backgrounds/Background1.bmp#210#640#6#10#0#./resources/Card_Selected.bmp#
 		./resources/card_backgrounds/Background2.bmp#430#640#6#10#1#./resources/Card_Selected.bmp#

@@ -1,10 +1,10 @@
 0_Player 1_1_
-1_Player 1_2_
-1_Player 1_2_
+1_Player 1_1_
 2_Player 1_3_
-3_Carl_8_
-4_Carl_16_
-5_Julian_18_
-6_Julian_20_
-7_Carl_27_
+3_Player 1_4_
+4_Player 1_4_
+5_Player 1_5_
+5__0_
+6__0_
+7__0_
 8__0_

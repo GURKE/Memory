@@ -72,22 +72,12 @@ int main(int argc, char *argv[])
 		return INITIALIZATION_FAILURE;
 	}
 
-	_screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_FULLSCREEN );
+	_screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_FULLSCREEN);
 	if (_screen == NULL)
 	{
 		fprintf(stderr, "SDL konnte nicht initialisiert werden:  %s\n", SDL_GetError());
 		return NO_SCREEN;
 	}
-
-
-	/*	fprintf(stderr, "\nh = ");
-	char c[5];
-	sprintf(c, "%d", SDL_GetVideoSurface()->h);
-	fprintf(stderr, c);
-	fprintf(stderr, "\nw = ");
-	sprintf(c, "%d", SDL_GetVideoInfo()->current_w);
-	fprintf(stderr, c);
-	fprintf(stderr, "\n ");*/
 
 	//Initialize SDL_ttf
 	if (TTF_Init() == -1)
@@ -98,6 +88,8 @@ int main(int argc, char *argv[])
 	//Set the window caption
 
 	SDL_WM_SetCaption("Mathe Memory", NULL);
+
+	srand(time(NULL)); /* start random number generater */
 
 	// Loads the Font
 	font = TTF_OpenFont("./resources/lazy.ttf", 28);
@@ -122,6 +114,8 @@ int main(int argc, char *argv[])
 	int Res1080p = 0;
 	
 	int Act_Textbox = -1;
+
+	oman.objects[MSTART_MENU][38].enabled = 0;
 
 	while (SDL_WaitEvent(&event))
 	{
@@ -264,7 +258,7 @@ int main(int argc, char *argv[])
 							}
 
 							int result = start_game(AmPlayers, *UsedCards, UsedCardsIndex, &card_background[Akt_Background], 0, Players, &cards, Res1080p);
-							_screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE | SDL_FULLSCREEN);
+							_screen = SDL_SetVideoMode(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_HWSURFACE|SDL_FULLSCREEN);
 							if (result == GEENDED) // Finishes Playing
 							{
 								Load_Highscore(AmPlayers);
@@ -488,7 +482,7 @@ int Print_Cards_In_Top_List()
 }
 
 int init_options()
-{
+{	
 	int i = 0;
 	while (!IS_NULL(oman.objects[MCONFIGURATIONS][i]))
 	{
@@ -549,7 +543,6 @@ int Key_Clicked(SDL_Event event, int Act_Textbox)
 		oman.objects[oman.Akt_Menu][Act_Textbox].picture = Create_Picture_By_Text(oman.objects[oman.Akt_Menu][Act_Textbox].picture, oman.objects[oman.Akt_Menu][Act_Textbox].label.Text, 0);
 		paint_screen(_screen, oman.objects[oman.Akt_Menu]);
 	}
-
 	if (event.key.keysym.sym == SDLK_DOWN)
 	{
 		if (oman.Akt_Button > -1)

@@ -248,7 +248,7 @@ int init_cards(struct Objectmanager *oman, struct Pair(*cards)[], char FileName[
 
 		j++;
 	}
-
+		
 	if (shuffle)
 	{
 		//shuffle cards in stack - knuth-fisher-yates shuffle **/

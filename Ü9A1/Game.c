@@ -388,11 +388,11 @@ int init_game(int AmPlayers, struct Object Cards[], int AmPairs, struct Pair(*ca
 
 	if (AmX * AmY < AmPairs * 2)
 		AmPairs -= (int)((2 * AmPairs - AmX * AmY + 1) / 2);
-
-	srand(time(NULL)); /* start random number generater */
-
-	AktPlayer = rand() % AmPlayers;
 	
+	AktPlayer = rand() % AmPlayers;
+
+	Players[AktPlayer].ObPlayername->picture = Create_Picture_By_Text(Players[AktPlayer].ObPlayername->picture, Players[AktPlayer].Name, 1);
+
 	// put random pairs into the deck
 
 	struct Pair RealStack[ARRAY_LENGTH];
